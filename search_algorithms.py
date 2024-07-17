@@ -21,7 +21,7 @@ def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
         if (
             0 <= x < len(board_data) and
             0 <= y < len(board_data[0]) and
-            #(x, y) not in reached  and # now its alway generate 4 surrounding drivable tile
+            (x, y) not in reached and
             board_data[x][y] >= 0
         ):
 
@@ -120,22 +120,19 @@ def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
         elif time_cost[current_node[0]][current_node[1]] < limit:
             explored = generate_neighbor(current_node, board_data, reached)
 
-            # if end in explored:
-            #     time_cost[end[0]][end[1]] = time_cost[current_node[0]][current_node[1]] + board_data[end[0]][
-            #         end[1]] + 1
-            #     road_cost[end[0]][end[1]] = road_cost[current_node[0]][current_node[1]] + 1
-            #     frontier.append(end)
-            #     reached[end] = current_node
+            if end in explored:
+                time_cost[end[0]][end[1]] = time_cost[current_node[0]][current_node[1]] + board_data[end[0]][
+                    end[1]] + 1
+                road_cost[end[0]][end[1]] = road_cost[current_node[0]][current_node[1]] + 1
+                frontier.append(end)
+                reached[end] = current_node
 
-            if time_cost[current_node[0]][current_node[1]] < limit:
+            elif time_cost[current_node[0]][current_node[1]] < limit - 1:
                 for nods in explored:
-                    if time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] - 1: # add this so that even if reached tile can revisited if the new time_cost is better
-                        time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
-                        road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-                        frontier.append(nods)
-                        reached[nods] = current_node
-                        if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-                            return generate_path(reached, start, end)
+                    time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
+                    road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+                    frontier.append(nods)
+                    reached[nods] = current_node
 
             # frontier.sort(key=lambda x: cost[x[0]][x[1]])
             frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
