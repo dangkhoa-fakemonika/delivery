@@ -49,21 +49,46 @@ size_of_grid = (10, 10)
 # ]
 
 # Assets test
+# Test 1:
+# board = [
+#     [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+#     [ 0, -1, -1,  0,  0, -1,  0, -1,  0,  0],
+#     [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0],
+#     [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+#     [ 0,  0,  0, -1,  0, -1, -1,  0,  0,  0],
+#     [ 0, -1,  -1,  0,  0,  0,  0, -1, -1,  0],
+#     [ 0,  0,  -1, -1,  0, -1,  0, -1,  0,  0],
+#     [-1, -1,  -1, -1,  0,  0,  0,  0,  0,  0],
+#     [100, 0, 50, 0, 20, -1, 10, -1,  0,  0],
+#     [ 0,  0,  0,  0,  0,  0, -1,  0,  0,  0],
+# ]
+
+# s_pos = (0, 0)
+# e_pos = (9, 0)
+#////////////////////////////////////////////////////////////////////////
+# Test 2: Car can now revisited tile that have already visited by another path
+# s_pos = (0, 0)
+# e_pos = (9, 0)
+# For example t(time limit) = 63, the car can move straight down from the start to reach the goal tile with the exact time of 63
+# But with t = 62, the previous search path stop right before the goal because of exceeding time limit, so we find an alternative path,
+# this time to be the optimal path it has to revisited tiles at position (0, 7) and (0, 8)
 board = [
-    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-    [ 0, -1, -1,  0,  0, -1,  0, -1,  0,  0],
-    [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0],
-    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
-    [ 0,  0,  0, -1,  0, -1, -1,  0,  0,  0],
-    [ 0, -1,  -1,  0,  0,  0,  0, -1, -1,  0],
-    [ 0,  0,  -1, -1,  0, -1,  0, -1,  0,  0],
-    [-1, -1,  -1, -1,  0,  0,  0,  0,  0,  0],
-    [100, 0, 50, 0, 20, -1, 10, -1,  0,  0],
-    [ 0,  0,  0,  0,  0,  0, -1,  0,  0,  0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [54, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, 0, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 50, -1, 20, -1, 10, -1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
 s_pos = (0, 0)
 e_pos = (9, 0)
+
+
 
 game_board = Board(10, 10, s_pos, e_pos)
 game_board.board_data = board
@@ -77,8 +102,7 @@ pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
 
-get_path, get_expansion = game_board.configure_algorithm('bfs')
-
+get_path, get_expansion = game_board.configure_algorithm('lvl2', 62)
 game_board.board_layout_init()  # Uncomment to load textures
 
 if get_path is None:

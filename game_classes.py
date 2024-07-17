@@ -66,7 +66,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         f = open(filename, 'r')
         # Do the import data here
 
-    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*'] = 'bfs', limit=float('inf')):
+    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2'] = 'bfs', limit=float('inf')):
         if algorithm == 'bfs':
             return algo.BFS(self.board_data, self.start, self.end)
         if algorithm == 'dfs':
@@ -74,8 +74,11 @@ Screen offset: ({self.offset_x, self.offset_y})
         if algorithm == 'ucs':
             # Implement UCS here
             pass
-        if algorithm == 'gbfs' or 'a*':
+        if algorithm == 'gbfs' or algorithm == 'a*':
             return algo.BestFS(self.board_data, self.start, self.end, limit)
         if algorithm == 'a*':
             # Implement A* here
             pass
+        if (algorithm == 'lvl2'):
+            return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
+        
