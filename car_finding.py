@@ -78,6 +78,9 @@ screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
 
 get_path, get_expansion = game_board.configure_algorithm('bfs')
+
+game_board.board_layout_init()  # Uncomment to load textures
+
 if get_path is None:
     get_path = []
 
@@ -87,7 +90,6 @@ frame = 0
 auto_move = False
 
 running = True
-print()
 # print(game_board)
 
 while running:
@@ -123,7 +125,7 @@ while running:
             path_steps = 0
 
     game_board.board_search(screen, get_expansion, expansion_steps)
-    game_board.board_display_layout(screen, get_path, path_steps)
+    game_board.board_display(screen, get_path, path_steps)
     pygame.display.flip()
 
 pygame.quit()
