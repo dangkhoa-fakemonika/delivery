@@ -1,14 +1,14 @@
 def configure_path(move_1: tuple[int, int], move_2: tuple[int, int]):
     if move_1 == -1:
-        return ""
+        return 0
     elif move_2[1] - move_1[1] == 1:
-        return "d"
+        return -90
     elif move_2[1] - move_1[1] == -1:
-        return "a"
+        return 90
     elif move_2[0] - move_1[0] == 1:
-        return "w"
+        return 180
     elif move_2[0] - move_1[0] == -1:
-        return "s"
+        return 0
 
 
 def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
@@ -46,19 +46,21 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
 def BFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
+    expansion: list[tuple[int, int]] = []
 
     while True:
         # No node can be explored
         if len(frontier) == 0:
-            return
+            return None, expansion
 
         current_node = frontier.pop(0)
+        expansion.append(current_node)
 
         explored = generate_neighbor(current_node, board_data, reached)
 
         if end in explored:  # Early goal test
             reached[end] = current_node
-            return generate_path(reached, start, end)
+            return generate_path(reached, start, end), expansion
 
         elif len(explored) != 0:
             frontier.extend(explored)
@@ -68,30 +70,33 @@ def BFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
 def DFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
+    expansion: list[tuple[int, int]] = []
 
     while True:
         # No node can be explored
         if len(frontier) == 0:
-            return [], []
+            return None, expansion
 
         current_node = frontier.pop()
+        expansion.append(current_node)
 
         explored = generate_neighbor(current_node, board_data, reached)
 
         if end in explored:  # Early goal test
             reached[end] = current_node
-            return generate_path(reached, start, end)
+            return generate_path(reached, start, end), expansion
 
         elif len(explored) != 0:
             frontier.extend(explored)
             reached.update({_: current_node for _ in explored})
 
 
-def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit = float('inf')):
+def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
     time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
     road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    expansion: list[tuple[int, int]] = []
 
     time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
     road_cost[start[0]][start[1]] = 0
@@ -103,15 +108,14 @@ def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
             #     for ppp in pp:
             #         print(f"{ppp:<3}", end=" ")
             #     print()
-            return [], []
+            return None, expansion
 
         current_node = frontier.pop(0)
         # print(cost[current_node[0]][current_node[1]])
+        expansion.append(current_node)
 
         if end == current_node:
-            print("Final time cost:", time_cost[end[0]][end[1]])
-            print("Final path cost:", road_cost[end[0]][end[1]])
-            return generate_path(reached, start, end)
+            return generate_path(reached, start, end), expansion
 
         elif time_cost[current_node[0]][current_node[1]] < limit:
             explored = generate_neighbor(current_node, board_data, reached)

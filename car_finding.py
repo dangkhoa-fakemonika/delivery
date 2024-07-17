@@ -1,6 +1,4 @@
 import pygame
-import search_algorithms as algo
-import display_setup as ds
 from game_classes import Board
 
 
@@ -37,17 +35,31 @@ size_of_grid = (10, 10)
 # e_pos = (8, 7)
 
 # Illusion of choice
+# board = [
+#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [100, -1, 50, -1, 20, -1, 10, -1, 0, 0],
+#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+# ]
+
+# Assets test
 board = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [100, -1, 50, -1, 20, -1, 10, -1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+    [ 0, -1, -1,  0,  0, -1,  0, -1,  0,  0],
+    [ 0, -1, -1,  0,  0,  0,  0, -1,  0,  0],
+    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+    [ 0,  0,  0, -1,  0, -1, -1,  0,  0,  0],
+    [ 0, -1,  -1,  0,  0,  0,  0, -1, -1,  0],
+    [ 0,  0,  -1, -1,  0, -1,  0, -1,  0,  0],
+    [-1, -1,  -1, -1,  0,  0,  0,  0,  0,  0],
+    [100, 0, 50, 0, 20, -1, 10, -1,  0,  0],
+    [ 0,  0,  0,  0,  0,  0, -1,  0,  0,  0],
 ]
 
 s_pos = (0, 0)
@@ -56,8 +68,8 @@ e_pos = (9, 0)
 game_board = Board(10, 10, s_pos, e_pos)
 game_board.board_data = board
 
-screen_res = (720, 720)
-fps = 6
+screen_res = (1020, 720)
+fps = 12
 pyclock = pygame.time.Clock()
 game_board.box_config(screen_res)
 
@@ -65,11 +77,12 @@ pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
 
-get_path = game_board.configure_algorithm('gbfs', 25)
+get_path, get_expansion = game_board.configure_algorithm('bfs')
 if get_path is None:
     get_path = []
 
-steps = 0
+path_steps = 0
+expansion_steps = 0
 frame = 0
 auto_move = False
 
@@ -90,10 +103,10 @@ while running:
             if event.key == pygame.K_ESCAPE:  # ESC to quit
                 running = False
                 break
-            if event.key == pygame.K_a and steps >= 1:
-                steps -= 1
-            if event.key == pygame.K_d and steps < len(get_path):
-                steps += 1
+            if event.key == pygame.K_a and path_steps >= 1:
+                path_steps -= 1
+            if event.key == pygame.K_d and path_steps < len(get_path):
+                path_steps += 1
             if event.key == pygame.K_SPACE:  # Space to autoplay
                 auto_move = not auto_move
                 if auto_move:
@@ -105,11 +118,12 @@ while running:
         frame = 0
 
     if auto_move:
-        steps += 1
-        if steps == len(get_path):
-            steps = 0
+        path_steps += 1
+        if path_steps == len(get_path):
+            path_steps = 0
 
-    game_board.board_display(screen, get_path, steps)
+    game_board.board_search(screen, get_expansion, expansion_steps)
+    game_board.board_display_layout(screen, get_path, path_steps)
     pygame.display.flip()
 
 pygame.quit()
