@@ -29,6 +29,7 @@ def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
 
     return explored
 
+
 def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
     neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
     explored = []
@@ -39,7 +40,7 @@ def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
         if (
             0 <= x < len(board_data) and
             0 <= y < len(board_data[0]) and 
-            #(x, y) not in reached  and //// now its alway generate 4 surrounding drivable tile
+            #  (x, y) not in reached and now its always generate 4 surrounding drivable tile
             board_data[x][y] >= 0
         ):
             explored.append((x, y))
@@ -58,6 +59,14 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
             # path_move.insert(0, configure_path(reached_table[end], end))
             # path_block.insert(0, end)
             return path_block  # path_move
+
+
+def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]]):
+    total_time = 0
+    for step in path:
+        total_time += board_data[step[0]][step[1]] + 1
+
+    return total_time - 1
 
 
 def BFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
@@ -152,9 +161,9 @@ def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
                 if nods == end:    
                     return generate_path(reached, start, end), expansion
 
-
             # frontier.sort(key=lambda x: cost[x[0]][x[1]])
             frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+
 
 def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
@@ -174,7 +183,7 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
         
         current_node = frontier.pop(0)
         expansion.append(current_node) 
-        if (current_node == end):
+        if current_node == end:
             print("found1")
             return generate_path(reached, start, end), expansion
         
@@ -182,7 +191,7 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
             print(current_node)
             explored = generate_neighbor_LVL2(current_node, board_data, reached)
             for nods in explored:
-                if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can revisited if the new time_cost is better
+                if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can re-visited if the new time_cost is better
                     time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
                     road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
                     frontier.append(nods)

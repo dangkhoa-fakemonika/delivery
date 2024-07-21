@@ -15,6 +15,7 @@ class Board:
         self.time_limit = float('inf')
         self.fuel_limit = float('inf')
         self.board_layout = None
+        self.time_counter = 0
 
     def __str__(self):  # To use print(game_board)
         res = f"""
@@ -33,11 +34,11 @@ Screen offset: ({self.offset_x, self.offset_y})
         self.box_size, self.offset_x, self.offset_y = ds.get_box_config(screen_res, self.size)
 
     def board_display_default(self, screen, path, step):
-        if step < len(path) - 1 != 0:
-            ds.draw_board_data(screen, self.board_data, path[step], self.end, self.size, self.box_size, algo.configure_path(path[step], path[step + 1]) ,self.offset_x, self.offset_y)
+        st = ds.draw_step(screen, self.board_data, path, step, self.box_size, self.offset_x, self.offset_y)
+        if step != 0 and st < len(path) - 1:
+            ds.draw_board_data(screen, self.board_data, st, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         else:
-            ds.draw_board_data(screen, self.board_data, self.end, self.end, self.size, self.box_size, 0 ,self.offset_x, self.offset_y)
-        ds.draw_step(screen, path, step, self.box_size, self.offset_x, self.offset_y)
+            ds.draw_board_data(screen, self.board_data, self.start, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_info_box(screen, self.start, self.end, self.time_limit, self.fuel_limit, self.size, self.box_size, self.offset_x, self.offset_y)
 
@@ -48,11 +49,11 @@ Screen offset: ({self.offset_x, self.offset_y})
         self.board_layout = ds.generate_layout(self.board_data, self.size)
 
     def board_display_layout(self, screen, path, step):
-        if step < len(path) - 1 != 0:
-            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, path[step], self.end, self.size, self.box_size, algo.configure_path(path[step], path[step + 1]) ,self.offset_x, self.offset_y)
+        st = ds.draw_step(screen, self.board_data, path, step, self.box_size, self.offset_x, self.offset_y)
+        if step != 0 and st < len(path) - 1:
+            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, path[st], self.end, self.size, self.box_size, algo.configure_path(path[st], path[st + 1]) ,self.offset_x, self.offset_y)
         else:
-            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, self.end, self.end, self.size, self.box_size, 0 ,self.offset_x, self.offset_y)
-        # ds.draw_step(screen, path, step, self.box_size, self.offset_x, self.offset_y)
+            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, self.start, self.end, self.size, self.box_size, 0 ,self.offset_x, self.offset_y)
         # ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_info_box(screen, self.start, self.end, self.time_limit, self.fuel_limit, self.size, self.box_size, self.offset_x, self.offset_y)
 
@@ -66,19 +67,22 @@ Screen offset: ({self.offset_x, self.offset_y})
         f = open(filename, 'r')
         # Do the import data here
 
-    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2'] = 'bfs', limit=float('inf')):
+    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2'] = 'bfs', limit=float('inf'), fuel=float('inf')):
+        self.time_limit = limit
+        self.fuel_limit = fuel
+
         if algorithm == 'bfs':
             return algo.BFS(self.board_data, self.start, self.end)
-        if algorithm == 'dfs':
-            return algo.BFS(self.board_data, self.start, self.end)
-        if algorithm == 'ucs':
+        elif algorithm == 'dfs':
+            return algo.DFS(self.board_data, self.start, self.end)
+        elif algorithm == 'ucs':
             # Implement UCS here
             pass
-        if algorithm == 'gbfs' or algorithm == 'a*':
+        elif algorithm == 'gbfs' or algorithm == 'a*':
             return algo.BestFS(self.board_data, self.start, self.end, limit)
-        if algorithm == 'a*':
+        elif algorithm == 'a*':
             # Implement A* here
             pass
-        if (algorithm == 'lvl2'):
+        if algorithm == 'lvl2':
             return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
         

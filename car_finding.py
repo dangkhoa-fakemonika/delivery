@@ -1,6 +1,6 @@
 import pygame
 from game_classes import Board
-
+import search_algorithms as algo
 
 def move_path(block: tuple[int, int], move: str) -> tuple[int, int]:
     if move == "w":
@@ -66,12 +66,13 @@ size_of_grid = (10, 10)
 # s_pos = (0, 0)
 # e_pos = (9, 0)
 #////////////////////////////////////////////////////////////////////////
-# Test 2: Car can now revisited tile that have already visited by another path
+# Test 2: Car can now re-visited tile that have already visited by another path
 # s_pos = (0, 0)
 # e_pos = (9, 0)
 # For example t(time limit) = 63, the car can move straight down from the start to reach the goal tile with the exact time of 63
 # But with t = 62, the previous search path stop right before the goal because of exceeding time limit, so we find an alternative path,
 # this time to be the optimal path it has to revisited tiles at position (0, 7) and (0, 8)
+
 board = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
@@ -89,7 +90,6 @@ s_pos = (0, 0)
 e_pos = (9, 0)
 
 
-
 game_board = Board(10, 10, s_pos, e_pos)
 game_board.board_data = board
 
@@ -102,8 +102,12 @@ pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
 
-get_path, get_expansion = game_board.configure_algorithm('lvl2', 62)
+get_path, get_expansion = game_board.configure_algorithm('lvl2')
 game_board.board_layout_init()  # Uncomment to load textures
+# print(get_path)
+
+cost = algo.generate_time_cost(game_board.board_data, get_path)
+print(cost)
 
 if get_path is None:
     get_path = []
@@ -145,7 +149,7 @@ while running:
 
     if auto_move:
         path_steps += 1
-        if path_steps == len(get_path):
+        if path_steps > cost:
             path_steps = 0
 
     game_board.board_search(screen, get_expansion, expansion_steps)
