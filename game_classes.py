@@ -66,7 +66,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         f = open(filename, 'r')
         # Do the import data here
 
-    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2'] = 'bfs', limit=float('inf')):
+    def configure_algorithm(self, algorithm: Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs', limit=float('inf'), fuel_cap=float('inf')):
         if algorithm == 'bfs':
             return algo.BFS(self.board_data, self.start, self.end)
         if algorithm == 'dfs':
@@ -81,4 +81,6 @@ Screen offset: ({self.offset_x, self.offset_y})
             pass
         if (algorithm == 'lvl2'):
             return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
+        if (algorithm == 'lvl3'):
+            return algo.LVL3(self.board_data, self.start, self.end, limit, fuel_cap)
         
