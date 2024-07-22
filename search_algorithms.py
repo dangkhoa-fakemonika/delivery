@@ -107,6 +107,34 @@ def DFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
             frontier.extend(explored)
             reached.update({_: current_node for _ in explored})
 
+def UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
+    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
+    frontier: list[tuple[int, int]] = [start]
+    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    expansion: list[tuple[int, int]] = []
+
+    road_cost[start[0]][start[1]] = 0
+    
+    while True:
+        if len(frontier) == 0:
+            return None, expansion
+
+        current_node = frontier.pop(0)
+        expansion.append(current_node)
+
+        explored = generate_neighbor(current_node, board_data, reached)
+        
+        if current_node == end:
+            return generate_path(reached, start, end), expansion
+
+        for nods in explored:
+            if nods not in reached or road_cost[nods[0]][nods[1]] > road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]]:
+                frontier.append(nods)
+                reached[nods] = current_node
+                road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]]
+        
+        frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+            
 
 def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}

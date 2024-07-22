@@ -70,10 +70,9 @@ Screen offset: ({self.offset_x, self.offset_y})
         if algorithm == 'bfs':
             return algo.BFS(self.board_data, self.start, self.end)
         if algorithm == 'dfs':
-            return algo.BFS(self.board_data, self.start, self.end)
+            return algo.DFS(self.board_data, self.start, self.end)
         if algorithm == 'ucs':
-            # Implement UCS here
-            pass
+            return algo.UCS(self.board_data, self.start, self.end)
         if algorithm == 'gbfs' or algorithm == 'a*':
             return algo.BestFS(self.board_data, self.start, self.end, limit)
         if algorithm == 'a*':
