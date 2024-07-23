@@ -21,32 +21,45 @@ def draw_grid(scr: pygame.Surface, grid_size, box_width, offset_x, offset_y):
                              (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width), width=1)
 
 
+def draw_text(text, font_name, size, coordinate, color=(255, 255, 255)) -> tuple:
+    display_font = pygame.font.SysFont(font_name, size)
+    display_text = display_font.render(text, True, color)
+    display_text_rect = display_text.get_rect()
+    display_text_rect.topleft = coordinate
+    return display_text, display_text_rect
+
+
 def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_width, offset_x=0,
                     offset_y=0):
-    display_font = pygame.font.Font('freesansbold.ttf', box_width // 2)
-
+    # display_font = pygame.font.SysFont("comicsansms", box_width // 2)
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if str(board_data[ii][it]) == '-1':
                 pygame.draw.rect(scr, (128, 128, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
             elif str(board_data[ii][it])[0] == 'F':
-                box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
-                box_value_rect = box_value.get_rect()
-                box_value_rect.center = (
-                    offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+                # box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
+                # box_value_rect = box_value.get_rect()
+                # box_value_rect.center = (
+                #     offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
                 pygame.draw.rect(scr, (200, 200, 0),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
-
+                box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'freesansbold.ttf',
+                                                      box_width // 1, (0, 0))
+                box_value_rect.center = (offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
                 scr.blit(box_value, box_value_rect)
 
             elif str(board_data[ii][it]) > '0':
-                box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
-                box_value_rect = box_value.get_rect()
-                box_value_rect.center = (
-                    offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+                # box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
+                # box_value_rect = box_value.get_rect()
+                # box_value_rect.center = (
+                #     offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+
                 pygame.draw.rect(scr, (10, 200, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+                box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'freesansbold.ttf',
+                                                      box_width // 1, (0, 0))
+                box_value_rect.center = (offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
 
                 scr.blit(box_value, box_value_rect)
 
@@ -62,12 +75,10 @@ def generate_layout(board_data, grid_size):
         return None
 
     assets_layout = [list(lane) for lane in board_data]
-    # fuel_stops = []
 
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if str(assets_layout[ii][it])[0] == 'F':
-                # fuel_stops.append((ii, it, int(str(assets_layout[ii][it]).lstrip('F'))))
                 assets_layout[ii][it] = 0
 
     # Block generator
@@ -160,7 +171,7 @@ def generate_layout(board_data, grid_size):
 def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, start, end, grid_size, box_width,
                            direction, offset_x=0,
                            offset_y=0):
-    display_font = pygame.font.Font('freesansbold.ttf', box_width // 2)
+    display_font = pygame.font.SysFont("comicsansms", box_width // 2)
     fuels = []
 
     assets_img = {
@@ -277,18 +288,23 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_si
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
 
-    current_cost = display_font.render(f"Path cost: {total_cost}", True, (255, 255, 255))
-    current_cost_rect = current_cost.get_rect()
-    current_cost_rect.topleft = (
-        scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5)
-    time_cost = display_font.render(f"Current Time: {total_time}", True, (255, 255, 255))
-    time_cost_rect = current_cost.get_rect()
-    time_cost_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6)
-    current_fuel = display_font.render(f"Current Fuel: {fuel_cost}", True, (255, 255, 255))
-    current_fuel_rect = current_cost.get_rect()
-    current_fuel_rect.topleft = (
-        scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7
-    )
+    # current_cost = display_font.render(f"Path cost: {total_cost}", True, (255, 255, 255))
+    # current_cost_rect = current_cost.get_rect()
+    # current_cost_rect.topleft = (
+    #     scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5)
+    # time_cost = display_font.render(f"Current Time: {total_time}", True, (255, 255, 255))
+    # time_cost_rect = current_cost.get_rect()
+    # time_cost_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6)
+    # current_fuel = display_font.render(f"Current Fuel: {fuel_cost}", True, (255, 255, 255))
+    # current_fuel_rect = current_fuel.get_rect()
+    # current_fuel_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7)
+
+    current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  box_size // 3,
+                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5))
+    time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", box_size // 3,
+                                          (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6))
+    current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", box_size // 3,
+                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7))
 
     scr.blits([
         (current_cost, current_cost_rect),
@@ -307,28 +323,62 @@ def draw_expansion(scr: pygame.Surface, path_movement, step, box_size, scr_offse
                           box_size, box_size))
 
 
-def draw_info_box(scr: pygame.Surface, start, end, time_limit, fuel_limit, grid_size, box_size, scr_offset_x,
+def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit, grid_size, box_size, scr_offset_x,
                   scr_offset_y):
     # display_font = pygame.font.Font('freesansbold.ttf', box_size // 2)
+
+    info_list = []
+
     display_font = pygame.font.SysFont("comicsansms", box_size // 3)
     pygame.draw.rect(scr, (255, 255, 255),
                      (scr_offset_x * 2 + box_size * grid_size[0], scr_offset_y, box_size * 4, box_size * grid_size[1]),
                      width=2)
-    start_value = display_font.render(f"Start: {start[0], start[1]}", True, (255, 255, 255))
-    start_value_rect = start_value.get_rect()
-    start_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10)
-    end_value = display_font.render(f"End: {end[0], end[1]}", True, (255, 255, 255))
-    end_value_rect = end_value.get_rect()
-    end_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size)
-    time_value = display_font.render(f"Time limit: {time_limit}", True, (255, 255, 255))
-    time_value_rect = time_value.get_rect()
-    time_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2)
-    fuel_value = display_font.render(f"Fuel limit: {fuel_limit}", True, (255, 255, 255))
-    fuel_value_rect = fuel_value.get_rect()
-    fuel_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3)
-    scr.blits([
-        (start_value, start_value_rect),
-        (end_value, end_value_rect),
-        (time_value, time_value_rect),
-        (fuel_value, fuel_value_rect),
-    ])
+    # start_value = display_font.render(f"Start: {start[0], start[1]}", True, (255, 255, 255))
+    # start_value_rect = start_value.get_rect()
+    # start_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10)
+    #
+    start_value, start_value_rect = draw_text(f"Start: {start[0], start[1]}", "comicsansms",  box_size // 3,
+                                              (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10))
+    info_list.append((start_value, start_value_rect))
+
+    # end_value = display_font.render(f"End: {end[0], end[1]}", True, (255, 255, 255))
+    # end_value_rect = end_value.get_rect()
+    # end_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size)
+
+    end_value, end_value_rect = draw_text(f"End: {end[0], end[1]}", "comicsansms",  box_size // 3,
+                                          (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size))
+    info_list.append((end_value, end_value_rect))
+
+    if level in ('lvl2', 'lvl3'):
+        # time_value = display_font.render(f"Time limit: {time_limit}", True, (255, 255, 255))
+        # time_value_rect = time_value.get_rect()
+        # time_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2)
+        time_value, time_value_rect = draw_text(f"Time limit: {time_limit}", "comicsansms",  box_size // 3,
+                                                (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2))
+
+        info_list.append((time_value, time_value_rect))
+    if level == 'lvl3':
+        # fuel_value = display_font.render(f"Fuel limit: {fuel_limit}", True, (255, 255, 255))
+        # fuel_value_rect = fuel_value.get_rect()
+        # fuel_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3)
+        fuel_value, fuel_value_rect = draw_text(f"Fuel limit: {fuel_limit}", "comicsansms",  box_size // 3,
+                                                (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3))
+        info_list.append((fuel_value, fuel_value_rect))
+
+    alias_name, alias_name_rect = draw_text(level.upper(), "comicsansms",  box_size // 3,
+                                            (scr_offset_x * 2 + box_size * (grid_size[0] + 1.5) , scr_offset_y + 10 + box_size * 4))
+    info_list.append((alias_name, alias_name_rect))
+
+    if alias_name not in ('dfs', 'ucs', 'gbfs', 'a*'):
+        pygame.draw.polygon(scr, (255, 255, 255), [
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 10 + box_size * 4),
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 10, scr_offset_y + 20 + box_size * 4),
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 30 + box_size * 4),
+        ])
+        pygame.draw.polygon(scr, (255, 255, 255), [
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 10 + box_size * 4),
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 20, scr_offset_y + 20 + box_size * 4),
+            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 30 + box_size * 4),
+        ])
+
+    scr.blits(info_list)
