@@ -31,13 +31,24 @@ def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_
             if str(board_data[ii][it]) == '-1':
                 pygame.draw.rect(scr, (128, 128, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
-            if str(board_data[ii][it]) > '0':
+            elif str(board_data[ii][it])[0] == 'F':
+                box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
+                box_value_rect = box_value.get_rect()
+                box_value_rect.center = (
+                    offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+                pygame.draw.rect(scr, (200, 200, 0),
+                                 (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+
+                scr.blit(box_value, box_value_rect)
+
+            elif str(board_data[ii][it]) > '0':
                 box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
                 box_value_rect = box_value.get_rect()
                 box_value_rect.center = (
                     offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
                 pygame.draw.rect(scr, (10, 200, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+
                 scr.blit(box_value, box_value_rect)
 
     pygame.draw.rect(scr, (255, 0, 0),
@@ -50,8 +61,17 @@ def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_
 def generate_layout(board_data, grid_size):
     if grid_size[0] >= 30 or grid_size[1] >= 30:
         return None
-    assets_layout = [list(lane) for lane in board_data]
 
+    assets_layout = [list(lane) for lane in board_data]
+    # fuel_stops = []
+
+    for ii in range(grid_size[0]):
+        for it in range(grid_size[1]):
+            if str(assets_layout[ii][it])[0] == 'F':
+                # fuel_stops.append((ii, it, int(str(assets_layout[ii][it]).lstrip('F'))))
+                assets_layout[ii][it] = 0
+
+    # Block generator
     for ii in range(grid_size[0] - 1):
         for it in range(grid_size[1] - 1):
             if (assets_layout[ii][it] == -1 and
@@ -63,7 +83,7 @@ def generate_layout(board_data, grid_size):
                 assets_layout[ii][it + 1] = -100
                 assets_layout[ii + 1][it + 1] = -100
             elif (assets_layout[ii][it] == -1 and
-                    assets_layout[ii + 1][it] == -1):
+                  assets_layout[ii + 1][it] == -1):
                 assets_layout[ii][it] = random.choice((-3, -13))
                 assets_layout[ii + 1][it] = -100
             elif (assets_layout[ii][it] == -1 and
@@ -89,6 +109,7 @@ def generate_layout(board_data, grid_size):
 
                 assets_layout[ii][it] = - 200 - side
 
+    # Road generator
     for ii in range(grid_size[0]):
         it = grid_size[1] - 1
         if assets_layout[ii][it] >= 0:
@@ -132,14 +153,16 @@ def generate_layout(board_data, grid_size):
             if assets_layout[ii][it] == -1:
                 assets_layout[ii][it] = random.choice((-1, -11))
 
-    for aa in assets_layout:
-        print(aa)
+    # for aa in assets_layout:
+    #     print(aa)
     return assets_layout
 
 
-def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, start, end, grid_size, box_width, direction, offset_x=0,
+def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, start, end, grid_size, box_width,
+                           direction, offset_x=0,
                            offset_y=0):
     display_font = pygame.font.Font('freesansbold.ttf', box_width // 2)
+    fuels = []
 
     assets_img = {
         'car': [pygame.image.load("assets/car_" + str(_) + ".png").convert_alpha() for _ in range(2)],
@@ -147,64 +170,91 @@ def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, sta
         'house': [pygame.image.load("assets/block_1x1_" + str(_) + ".png").convert_alpha() for _ in range(2)],
         'road': [pygame.image.load("assets/road_" + str(_) + ".png").convert_alpha() for _ in range(16)],
         'time_stop': [pygame.image.load("assets/time_stop_" + str(_) + ".png").convert_alpha() for _ in range(1)],
+        'fuel_stop': [pygame.image.load("assets/fuel_stop_" + str(_) + ".png").convert_alpha() for _ in range(1)],
         'end_stop': [pygame.image.load("assets/end_" + str(_) + ".png").convert_alpha() for _ in range(1)],
         'landscape': [pygame.image.load("assets/block_1x2_" + str(_) + ".png").convert_alpha() for _ in range(2)],
         'portrait': [pygame.image.load("assets/block_2x1_" + str(_) + ".png").convert_alpha() for _ in range(2)],
     }
 
-    car = pygame.transform.scale(pygame.transform.rotate(assets_img['car'][0], direction), (box_width + 2, box_width + 2))
+    car = pygame.transform.scale(pygame.transform.rotate(assets_img['car'][0], direction),
+                                 (box_width + 2, box_width + 2))
     # building = pygame.transform.scale(pygame.transform.rotate(assets_img['building'][0], 0), (box_width * 2.2, box_width * 2.2))
     # court = pygame.transform.scale(pygame.transform.rotate(assets_img['portrait'][0], 0), (box_width * 1.2, box_width * 2.2))
     # park = pygame.transform.scale(pygame.transform.rotate(assets_img['landscape'][0], 0), (box_width * 2.2, box_width * 1.2))
     # house = pygame.transform.scale(pygame.transform.rotate(assets_img['house'][0], 0), (box_width * 1.2, box_width * 1.2))
     # road = pygame.transform.scale(pygame.transform.rotate(assets_img['road'][0], 0),(box_width, box_width))
-    time_stop = pygame.transform.scale(pygame.transform.rotate(assets_img['time_stop'][0], 0),(box_width * 1.2, box_width * 1.2))
-    end_point = pygame.transform.scale(pygame.transform.rotate(assets_img['end_stop'][0], 0),(box_width * 1.2, box_width * 1.2))
+    time_stop = pygame.transform.scale(pygame.transform.rotate(assets_img['time_stop'][0], 0),
+                                       (box_width * 1.2, box_width * 1.2))
+    end_point = pygame.transform.scale(pygame.transform.rotate(assets_img['end_stop'][0], 0),
+                                       (box_width * 1.2, box_width * 1.2))
+    fuel_stop = pygame.transform.scale(pygame.transform.rotate(assets_img['fuel_stop'][0], 0),
+                                       (box_width * 1.2, box_width * 1.2))
 
     # scr.blit(road, (offset_x, offset_y))
 
     # assets_generate = generate_layout(board_data, grid_size)
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
+            if str(board_data[ii][it])[0] == 'F':
+                fuels.append((ii, it, board_data[ii][it]))
+                board_data[ii][it] = 0
             road = pygame.transform.scale(pygame.transform.rotate(assets_img['road'][0], 0), (box_width, box_width))
             scr.blit(road, (offset_x + it * box_width, offset_y + ii * box_width))
 
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if assets_generate[ii][it] == -1 or assets_generate[ii][it] == -11:
-                house = pygame.transform.scale(pygame.transform.rotate(assets_img['house'][assets_generate[ii][it] < -10], 0), (box_width * 1.2, box_width * 1.2))
+                house = pygame.transform.scale(
+                    pygame.transform.rotate(assets_img['house'][assets_generate[ii][it] < -10], 0),
+                    (box_width * 1.2, box_width * 1.2))
                 scr.blit(house, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
             if assets_generate[ii][it] == -2 or assets_generate[ii][it] == -12:
-                building = pygame.transform.scale(pygame.transform.rotate(assets_img['building'][assets_generate[ii][it] < -10], 0), (box_width * 2.2, box_width * 2.2))
+                building = pygame.transform.scale(
+                    pygame.transform.rotate(assets_img['building'][assets_generate[ii][it] < -10], 0),
+                    (box_width * 2.2, box_width * 2.2))
                 scr.blit(building, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
             if assets_generate[ii][it] == -3 or assets_generate[ii][it] == -13:
-                court = pygame.transform.scale(pygame.transform.rotate(assets_img['portrait'][assets_generate[ii][it] < -10], 0), (box_width * 1.2, box_width * 2.2))
+                court = pygame.transform.scale(
+                    pygame.transform.rotate(assets_img['portrait'][assets_generate[ii][it] < -10], 0),
+                    (box_width * 1.2, box_width * 2.2))
                 scr.blit(court, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
             if assets_generate[ii][it] == -4 or assets_generate[ii][it] == -14:
-                park = pygame.transform.scale(pygame.transform.rotate(assets_img['landscape'][assets_generate[ii][it] < -10], 0),(box_width * 2.2, box_width * 1.2))
+                park = pygame.transform.scale(
+                    pygame.transform.rotate(assets_img['landscape'][assets_generate[ii][it] < -10], 0),
+                    (box_width * 2.2, box_width * 1.2))
                 scr.blit(park, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
 
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if assets_generate[ii][it] < -200:
-                road = pygame.transform.scale(pygame.transform.rotate(assets_img['road'][(assets_generate[ii][it] + 200) * -1], 0),(box_width, box_width))
+                road = pygame.transform.scale(
+                    pygame.transform.rotate(assets_img['road'][(assets_generate[ii][it] + 200) * -1], 0),
+                    (box_width, box_width))
                 scr.blit(road, (offset_x + it * box_width, offset_y + ii * box_width))
 
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if board_data[ii][it] > 0:
+                box_value = display_font.render(str(assets_generate[ii][it]), True, (255, 255, 255))
                 scr.blit(time_stop, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
-                box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
                 box_value_rect = box_value.get_rect()
                 box_value_rect.center = (
                     offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+
+    for f in fuels:
+        box_value = display_font.render(f[2], True, (255, 255, 255))
+        scr.blit(fuel_stop, (offset_x + (f[1] - 0.1) * box_width, offset_y + (f[0] - 0.1) * box_width))
+        box_value_rect = box_value.get_rect()
+        box_value_rect.center = (
+            offset_x + f[1] * box_width + box_width // 2, offset_y + f[0] * box_width + box_width // 2)
+        board_data[f[0]][f[1]] = f[2]
 
     scr.blit(car, (offset_x + start[1] * box_width, offset_y + start[0] * box_width))
     scr.blit(end_point, (offset_x + end[1] * box_width, offset_y + end[0] * box_width))
 
 
 def draw_step(scr: pygame.Surface, board_data, path_movement, time, box_size, scr_offset_x, scr_offset_y):
-    display_font = pygame.font.SysFont("comicsansms", box_size // 2)
+    display_font = pygame.font.SysFont("comicsansms", box_size // 3)
 
     total_cost = 0
     total_time = 0
@@ -224,9 +274,10 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, box_size, sc
             stopped_time = 0
             total_cost += 1
 
-    current_cost = display_font.render(f"Path cost: {total_cost}", True,(255, 255, 255))
+    current_cost = display_font.render(f"Path cost: {total_cost}", True, (255, 255, 255))
     current_cost_rect = current_cost.get_rect()
-    current_cost_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10,  scr_offset_y + 10 + box_size * 5)
+    current_cost_rect.topleft = (
+        scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5)
     time_cost = display_font.render(f"Current Time: {total_time}", True, (255, 255, 255))
     time_cost_rect = current_cost.get_rect()
     time_cost_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6)
@@ -250,7 +301,7 @@ def draw_expansion(scr: pygame.Surface, path_movement, step, box_size, scr_offse
 def draw_info_box(scr: pygame.Surface, start, end, time_limit, fuel_limit, grid_size, box_size, scr_offset_x,
                   scr_offset_y):
     # display_font = pygame.font.Font('freesansbold.ttf', box_size // 2)
-    display_font = pygame.font.SysFont("comicsansms", box_size//2)
+    display_font = pygame.font.SysFont("comicsansms", box_size // 3)
     pygame.draw.rect(scr, (255, 255, 255),
                      (scr_offset_x * 2 + box_size * grid_size[0], scr_offset_y, box_size * 4, box_size * grid_size[1]),
                      width=2)

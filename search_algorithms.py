@@ -63,6 +63,8 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
 
 
 def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]]):
+    if path is None:
+        return 0
     total_time = 0
     for step in path:
         total_time += board_data[step[0]][step[1]] + 1
@@ -116,6 +118,7 @@ def DFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
         elif len(explored) != 0:
             frontier.extend(explored)
             reached.update({_: current_node for _ in explored})
+
 
 def UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
@@ -228,6 +231,7 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     if nods == end and time_cost[nods[0]][nods[1]] <= limit:
                         return generate_path(reached, start, end), expansion
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+
 
 def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}

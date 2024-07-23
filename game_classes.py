@@ -15,7 +15,6 @@ class Board:
         self.time_limit = float('inf')
         self.fuel_limit = float('inf')
         self.board_layout = None
-        self.time_counter = 0
 
     def __str__(self):  # To use print(game_board)
         res = f"""
@@ -36,7 +35,7 @@ Screen offset: ({self.offset_x, self.offset_y})
     def board_display_default(self, screen, path, step):
         st = ds.draw_step(screen, self.board_data, path, step, self.box_size, self.offset_x, self.offset_y)
         if step != 0 and st < len(path) - 1:
-            ds.draw_board_data(screen, self.board_data, st, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
+            ds.draw_board_data(screen, self.board_data, path[st], self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         else:
             ds.draw_board_data(screen, self.board_data, self.start, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
@@ -81,6 +80,8 @@ Screen offset: ({self.offset_x, self.offset_y})
             pass
         if algorithm == 'lvl2':
             return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
-        if (algorithm == 'lvl3'):
+        if algorithm == 'lvl3':
+            self.time_limit = limit
+            self.fuel_limit = fuel_cap
             return algo.LVL3(self.board_data, self.start, self.end, limit, fuel_cap)
         
