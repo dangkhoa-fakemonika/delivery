@@ -28,10 +28,10 @@ def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_
 
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
-            if board_data[ii][it] == -1:
+            if str(board_data[ii][it]) == '-1':
                 pygame.draw.rect(scr, (128, 128, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
-            if board_data[ii][it] > 0:
+            if str(board_data[ii][it]) > '0':
                 box_value = display_font.render(str(board_data[ii][it]), True, (255, 255, 255))
                 box_value_rect = box_value.get_rect()
                 box_value_rect.center = (

@@ -25,12 +25,12 @@ size_of_grid = (10, 10)
 #     [0, 0, 0, 0, -1, 0, 0, -1, 0, 0],
 #     [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
 #     [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
-#     [0, 0, 0, 0, -1, 5, -1, 0, -1, 0],
+#     [0, 0, "F10", 0, -1, 5, -1, 0, -1, 0],
 #     [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
 #     [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
 #     [0, 0, 5, 0, 0, 0, -1, -1, -1, 0]
 # ]
-#
+
 # s_pos = (1, 1)
 # e_pos = (8, 7)
 
@@ -73,22 +73,39 @@ size_of_grid = (10, 10)
 # But with t = 62, the previous search path stop right before the goal because of exceeding time limit, so we find an alternative path,
 # this time to be the optimal path it has to revisited tiles at position (0, 7) and (0, 8)
 
+# board = [
+#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+#     [54, -1, 51, -1, 0, -1, 0, -1, 0, 0],
+#     [0, 0, 0, 0, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 50, -1, 20, -1, 10, -1, 0, 0],
+#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+# ]
+
+# s_pos = (0, 0)
+# e_pos = (9, 0)
+
+#Test3 for lvl3
+
 board = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, "F1", 0, 0, 0, 0, 0, 0, 0],
     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
     [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
-    [54, -1, 0, -1, 0, -1, 0, -1, 0, 0],
     [0, 0, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, 0],
+    [54, -1, 51, -1, 0, -1, 0, -1, 0, 0],
+    [0, 0, 0, 0, 0, -1, 0, -1, 0, 0],
     [0, -1, 50, -1, 20, -1, 10, -1, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-s_pos = (0, 0)
-e_pos = (9, 0)
-
+s_pos = (0, 1)
+e_pos = (3, 1)
 
 game_board = Board(10, 10, s_pos, e_pos)
 game_board.board_data = board
@@ -102,12 +119,9 @@ pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
 
-get_path, get_expansion = game_board.configure_algorithm('lvl2')
-game_board.board_layout_init()  # Uncomment to load textures
-# print(get_path)
-
-cost = algo.generate_time_cost(game_board.board_data, get_path)
-print(cost)
+get_path, get_expansion = game_board.configure_algorithm('lvl3', 10, 4)
+#game_board.board_layout_init()  # Uncomment to load textures
+print(get_path)
 
 if get_path is None:
     get_path = []
