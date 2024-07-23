@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 
@@ -253,11 +252,12 @@ def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, sta
     scr.blit(end_point, (offset_x + end[1] * box_width, offset_y + end[0] * box_width))
 
 
-def draw_step(scr: pygame.Surface, board_data, path_movement, time, box_size, scr_offset_x, scr_offset_y):
+def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
     display_font = pygame.font.SysFont("comicsansms", box_size // 3)
 
     total_cost = 0
     total_time = 0
+    fuel_cost = fuel
     stopped_time = 0
 
     while total_time < time:
@@ -266,13 +266,16 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, box_size, sc
                          (scr_offset_x + path_movement[total_cost][1] * box_size,
                           scr_offset_y + path_movement[total_cost][0] * box_size,
                           box_size, box_size))
-
         total_time += 1
         stopped_time += 1
+        current_block = board_data[path_movement[total_cost][0]][path_movement[total_cost][1]]
+        fuel_cost -= 1
 
-        if board_data[path_movement[total_cost][0]][path_movement[total_cost][1]] + 1 == stopped_time:
+        if int(str(current_block).strip('F')) + 1 == stopped_time:
             stopped_time = 0
             total_cost += 1
+            if str(current_block)[0] == 'F':
+                fuel_cost = fuel
 
     current_cost = display_font.render(f"Path cost: {total_cost}", True, (255, 255, 255))
     current_cost_rect = current_cost.get_rect()
@@ -281,10 +284,16 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, box_size, sc
     time_cost = display_font.render(f"Current Time: {total_time}", True, (255, 255, 255))
     time_cost_rect = current_cost.get_rect()
     time_cost_rect.topleft = (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6)
+    current_fuel = display_font.render(f"Current Fuel: {fuel_cost}", True, (255, 255, 255))
+    current_fuel_rect = current_cost.get_rect()
+    current_fuel_rect.topleft = (
+        scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7
+    )
 
     scr.blits([
         (current_cost, current_cost_rect),
-        (time_cost, time_cost_rect)
+        (time_cost, time_cost_rect),
+        (current_fuel, current_fuel_rect)
     ])
 
     return total_cost

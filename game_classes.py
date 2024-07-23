@@ -48,7 +48,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         self.board_layout = ds.generate_layout(self.board_data, self.size)
 
     def board_display_layout(self, screen, path, step):
-        st = ds.draw_step(screen, self.board_data, path, step, self.box_size, self.offset_x, self.offset_y)
+        st = ds.draw_step(screen, self.board_data, path, step, self.fuel_limit, self.box_size, self.offset_x, self.offset_y)
         if step != 0 and st < len(path) - 1:
             ds.draw_assets_board_data(screen, self.board_data, self.board_layout, path[st], self.end, self.size, self.box_size, algo.configure_path(path[st], path[st + 1]) ,self.offset_x, self.offset_y)
         else:
@@ -74,7 +74,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         if algorithm == 'ucs':
             return algo.UCS(self.board_data, self.start, self.end)
         if algorithm == 'gbfs' or algorithm == 'a*':
-            return algo.BestFS(self.board_data, self.start, self.end, limit)
+            return algo.BestFS(self.board_data, self.start, self.end)
         elif algorithm == 'a*':
             # Implement A* here
             pass

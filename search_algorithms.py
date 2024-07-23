@@ -67,7 +67,7 @@ def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]])
         return 0
     total_time = 0
     for step in path:
-        total_time += board_data[step[0]][step[1]] + 1
+        total_time += int(str(board_data[step[0]][step[1]]).strip('F')) + 1
 
     return total_time - 1
 
