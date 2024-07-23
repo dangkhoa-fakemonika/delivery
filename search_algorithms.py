@@ -149,52 +149,65 @@ def UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
             
 
-def BestFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
+def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
+    if start == end:
+        return [start], []
+    
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
-    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    heuristic = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
-
-    time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
-    road_cost[start[0]][start[1]] = 0
+    
+    heuristic[start[0]][start[1]] = abs(end[0] - start[0] + end[1] - start[1]) # Manhattan distance
 
     while True:
         # No node can be explored
         if len(frontier) == 0:
-            # for pp in time_cost:
-            #     for ppp in pp:
-            #         print(f"{ppp:<3}", end=" ")
-            #     print()
             return None, expansion  
 
         current_node = frontier.pop(0)
-        # print(cost[current_node[0]][current_node[1]])
         expansion.append(current_node)
 
-        if end == current_node:
-            return generate_path(reached, start, end), expansion
+        explored = generate_neighbor(current_node, board_data, reached)
 
-        elif time_cost[current_node[0]][current_node[1]] < limit:
-            explored = generate_neighbor(current_node, board_data, reached)
-
-            # if end in explored:
-            #     time_cost[end[0]][end[1]] = time_cost[current_node[0]][current_node[1]] + board_data[end[0]][
-            #         end[1]] + 1
-            #     road_cost[end[0]][end[1]] = road_cost[current_node[0]][current_node[1]] + 1
-            #     frontier.append(end)
-            #     reached[end] = current_node
-
-            for nods in explored:
-                time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
-                road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+        for nods in explored:
+            if nods not in reached:
+                heuristic[nods[0]][nods[1]] = abs(end[0] - nods[0] + end[1] - nods[1])
                 frontier.append(nods)
                 reached[nods] = current_node
                 if nods == end:    
                     return generate_path(reached, start, end), expansion
 
-            # frontier.sort(key=lambda x: cost[x[0]][x[1]])
-            frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+        frontier.sort(key=lambda x: heuristic[x[0]][x[1]])
+
+def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
+    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
+    frontier: list[tuple[int, int]] = [start]
+    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    expansion: list[tuple[int, int]] = []
+
+    road_cost[start[0]][start[1]] = 0 + abs(end[0] - start[0] + end[1] - start[1]) # F = G + H  
+    
+    while True:
+        if len(frontier) == 0:
+            return None, expansion
+
+        current_node = frontier.pop(0)
+        expansion.append(current_node)
+
+        explored = generate_neighbor(current_node, board_data, reached)
+        
+        if current_node == end:
+            return generate_path(reached, start, end), expansion
+
+        for nods in explored:
+            new_cost = road_cost[current_node[0]][current_node[1]] - abs(end[0] - current_node[0] + end[1] - current_node[1]) + board_data[nods[0]][nods[1]] + abs(end[0] - nods[0] + end[1] - nods[1])
+            if nods not in reached or road_cost[nods[0]][nods[1]] > new_cost:
+                frontier.append(nods)
+                reached[nods] = current_node
+                road_cost[nods[0]][nods[1]] = new_cost
+        
+        frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
 
 
 def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
