@@ -261,11 +261,11 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_si
         total_time += 1
         stopped_time += 1
         current_block = board_data[path_movement[total_cost][0]][path_movement[total_cost][1]]
-        fuel_cost -= 1
 
         if int(str(current_block).strip('F')) + 1 == stopped_time:
             stopped_time = 0
             total_cost += 1
+            fuel_cost -= 1
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
 
