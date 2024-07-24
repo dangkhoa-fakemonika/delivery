@@ -48,6 +48,21 @@ def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
 
     return explored
 
+def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, goal):
+    neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    explored = []
+
+    for neighbor in neighbors:
+        x, y = block[0] + neighbor[0], block[1] + neighbor[1]
+        if (
+            0 <= x < len(board_data) and
+            0 <= y < len(board_data[0]) and 
+            (x, y) not in reached and
+            str(board_data[x][y]) >= '0'
+        ):
+            explored.append((x, y))
+    explored.sort(key=lambda x: abs(goal[0] - x[0]) + abs(goal[1] - x[1])) #prioritize tile closer to goal based on manhattan distance 
+    return explored
 
 def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: tuple[int, int], end: tuple[int, int]):
     # path_move = []
@@ -155,10 +170,8 @@ def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
     
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
-    heuristic = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
-    
-    heuristic[start[0]][start[1]] = abs(end[0] - start[0] + end[1] - start[1]) # Manhattan distance
+
 
     while True:
         # No node can be explored
@@ -172,13 +185,12 @@ def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
 
         for nods in explored:
             if nods not in reached:
-                heuristic[nods[0]][nods[1]] = abs(end[0] - nods[0] + end[1] - nods[1])
                 frontier.append(nods)
                 reached[nods] = current_node
                 if nods == end:    
                     return generate_path(reached, start, end), expansion
 
-        frontier.sort(key=lambda x: heuristic[x[0]][x[1]])
+        frontier.sort(key=lambda x: abs(end[0] - x[0]) + abs(end[1] - x[1])) # Manhattan distance
 
 def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
@@ -186,7 +198,7 @@ def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
     road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
 
-    road_cost[start[0]][start[1]] = 0 + abs(end[0] - start[0] + end[1] - start[1]) # F = G + H  
+    road_cost[start[0]][start[1]] = 0 
     
     while True:
         if len(frontier) == 0:
@@ -201,13 +213,13 @@ def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
             return generate_path(reached, start, end), expansion
 
         for nods in explored:
-            new_cost = road_cost[current_node[0]][current_node[1]] - abs(end[0] - current_node[0] + end[1] - current_node[1]) + board_data[nods[0]][nods[1]] + abs(end[0] - nods[0] + end[1] - nods[1])
+            new_cost = road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
             if nods not in reached or road_cost[nods[0]][nods[1]] > new_cost:
                 frontier.append(nods)
                 reached[nods] = current_node
                 road_cost[nods[0]][nods[1]] = new_cost
         
-        frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+        frontier.sort(key=lambda x: road_cost[x[0]][x[1]] + abs(end[0] - x[0]) + abs(end[1] - x[1])) # F = G + H  
 
 
 def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
@@ -223,17 +235,14 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
     while True:
         # No node can be explored
         if len(frontier) == 0:
-            print("pq empty!")
             return None, expansion  
         
         current_node = frontier.pop(0)
         expansion.append(current_node) 
         if current_node == end:
-            print("found1")
             return generate_path(reached, start, end), expansion
         
         if time_cost[current_node[0]][current_node[1]] < limit:
-            print(current_node)
             explored = generate_neighbor_LVL2(current_node, board_data, reached)
             for nods in explored:
                 if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can re-visited if the new time_cost is better
@@ -246,55 +255,96 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
 
 
+# def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
+#     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
+#     frontier: list[tuple[int, int]] = [start]
+#     time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+#     road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+#     currentFuel = [[0 for _ in range(len(board_data))] for __ in range(len(board_data))]
+#     expansion: list[tuple[int, int]] = []
+
+#     time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
+#     road_cost[start[0]][start[1]] = 0
+#     currentFuel[start[0]][start[1]] = fuel_cap
+#     while True:
+        
+#         # No node can be explored
+#         if len(frontier) == 0:
+#             return None, expansion  
+        
+#         current_node = frontier.pop(0)
+        
+#         expansion.append(current_node) 
+#         if (current_node == end):
+#             return generate_path(reached, start, end), expansion
+        
+#         if time_cost[current_node[0]][current_node[1]] < limit and currentFuel[current_node[0]][current_node[1]] > 0:
+#             print(current_node, 'road: ', road_cost[current_node[0]][current_node[1]], ', time: ', time_cost[current_node[0]][current_node[1]], ', fuel: ', currentFuel[current_node[0]][current_node[1]])
+#             explored = generate_neighbor_LVL2(current_node, board_data, reached)
+#             for nods in explored:
+#                 if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
+#                     added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
+#                 else:
+#                     added_time_cost = board_data[nods[0]][nods[1]] + 1
+#                 if (
+#                     nods not in reached or 
+#                     time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + added_time_cost or
+#                     currentFuel[nods[0]][nods[1]] < currentFuel[current_node[0]][current_node[1]]
+#                 ):
+#                     if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
+#                         currentFuel[nods[0]][nods[1]] = fuel_cap
+#                     else:
+#                         currentFuel[nods[0]][nods[1]] = currentFuel[current_node[0]][current_node[1]] - 1
+
+#                     time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + added_time_cost
+#                     road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+
+#                     frontier.append(nods)
+#                     reached[nods] = current_node
+
+#                     if nods == end and time_cost[nods[0]][nods[1]] <= limit:
+#                         return generate_path(reached, start, end), expansion
+#             frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+
 def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
-    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
-    frontier: list[tuple[int, int]] = [start]
-    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    currentFuel = [[0 for _ in range(len(board_data))] for __ in range(len(board_data))]
-    expansion: list[tuple[int, int]] = []
+    for step in range (0, len(board_data) * len(board_data[0])):
+        print('maxstep = ', step)
+        reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
+        path = [start]
+        if LVL3_Backtracking(board_data, start, end, step, 0, limit, fuel_cap, fuel_cap, path, reached):
+            print(step, 'step')
+            return path, None
 
-    time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
-    road_cost[start[0]][start[1]] = 0
-    currentFuel[start[0]][start[1]] = fuel_cap
-    while True:
-        
-        # No node can be explored
-        if len(frontier) == 0:
-            print("pq empty!")
-            return None, expansion  
-        
-        current_node = frontier.pop(0)
-        
-        expansion.append(current_node) 
-        if (current_node == end):
-            print("found1")
-            return generate_path(reached, start, end), expansion
-        
-        if time_cost[current_node[0]][current_node[1]] < limit and currentFuel[current_node[0]][current_node[1]] > 0:
-            print(current_node, 'road: ', road_cost[current_node[0]][current_node[1]], ', time: ', time_cost[current_node[0]][current_node[1]], ', fuel: ', currentFuel[current_node[0]][current_node[1]])
-            explored = generate_neighbor_LVL2(current_node, board_data, reached)
-            for nods in explored:
-                if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
-                    added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
-                else:
-                    added_time_cost = board_data[nods[0]][nods[1]] + 1
-                if (
-                    nods not in reached or 
-                    time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + added_time_cost or
-                    currentFuel[nods[0]][nods[1]] < currentFuel[current_node[0]][current_node[1]]
-                ):
-                    if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
-                        currentFuel[nods[0]][nods[1]] = fuel_cap
-                    else:
-                        currentFuel[nods[0]][nods[1]] = currentFuel[current_node[0]][current_node[1]] - 1
+    return None, None
 
-                    time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + added_time_cost
-                    road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-
-                    frontier.append(nods)
-                    reached[nods] = current_node
-
-                    if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-                        return generate_path(reached, start, end), expansion
-            frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end: tuple[int, int], remaining_step: int, cur_time: int, time_limit: int, cur_fuel: int, fuel_cap: int, cur_path: list[int, int], reached: dict[tuple[int, int]: tuple[int, int]]):
+    if current == end:
+        if cur_time <= time_limit:
+            return True
+        else:
+            return False
+        
+    if remaining_step <= 0 or cur_fuel <= 0 or cur_time >= time_limit:
+        return False
+    if str(board_data[current[0]][current[1]])[0] == 'F': #is a fuel station
+        added_time_cost = int((board_data[current[0]][current[1]])[1:]) + 1
+        cur_fuel = fuel_cap
+    else:
+        added_time_cost = board_data[current[0]][current[1]] + 1
+    explored = generate_neighbor_LVL3(current, board_data, reached, end)
+    for nods in explored:
+        reached[nods] = current
+        if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
+            new_reached: dict[tuple[int, int]: tuple[int, int]] = {nods: -1}
+            cur_path.append(nods)
+            print('fuel station reached at', current, ', remaining step: ', remaining_step)
+            if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, fuel_cap, fuel_cap, cur_path, new_reached):
+                return True
+            cur_path.pop()
+            new_reached.pop(nods)
+        cur_path.append(nods)
+        if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, cur_fuel - 1, fuel_cap, cur_path, reached):
+            return True
+        reached.pop(nods)
+        cur_path.pop()
+    return False

@@ -18,7 +18,7 @@ def move_path(block: tuple[int, int], move: str) -> tuple[int, int]:
 
 size_of_grid = (10, 10)
 
-# Case 1
+#base test
 # board = [
 #     [0, 0, 0, 0, -1, -1, 0, 0, 0, 0],
 #     [0, 0, 0, 0, 0, 0, 0, -1, 0, -1],
@@ -26,12 +26,12 @@ size_of_grid = (10, 10)
 #     [0, 0, 0, 0, -1, 0, 0, -1, 0, 0],
 #     [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
 #     [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
-#     [0, 0, "F10", 0, -1, 5, -1, 0, -1, 0],
+#     [0, 0, 0, 0, -1, 5, -1, 0, -1, 0],
 #     [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
 #     [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
 #     [0, 0, 5, 0, 0, 0, -1, -1, -1, 0]
 # ]
-#
+
 # s_pos = (1, 1)
 # e_pos = (8, 7)
 
@@ -74,23 +74,23 @@ size_of_grid = (10, 10)
 # But with t = 62, the previous search path stop right before the goal because of exceeding time limit, so we find an alternative path,
 # this time to be the optimal path it has to revisited tiles at position (0, 7) and (0, 8)
 
-board = [
-    [0, 0, 0, 0, 0, 0, 0, -1, 0, 0],
-    [0, -1, -1, -1, 0, -1, -1, 0, 0, 0],
-    [0, -1, 0, -1, 0, -1, -1, 0, 0, 0],
-    [-1, -1, 0, -1, 0, 0, 0, 0, -1, 0],
-    [0, -1, 0, -1, -1, -1, 0, -1, 0, 0],
-    [0, -1, 0, -1, -1, -1, 0, 0, -1, 0],
-    [54, -1, 51, -1, 0, -1, 0, -1, 0, 0],
-    [0, 0, 0, 0, 0, -1, 0, -1, 0, 0],
-    [0, -1, 50, -1, 20, -1, 10, -1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
+# board = [
+#     [0, 0, 0, 0, 0, 0, 0, -1, 0, 0],
+#     [0, -1, -1, -1, 0, -1, -1, 0, 0, 0],
+#     [0, -1, 0, -1, 0, -1, -1, 0, 0, 0],
+#     [-1, -1, 0, -1, 0, 0, 0, 0, -1, 0],
+#     [0, -1, 0, -1, -1, -1, 0, -1, 0, 0],
+#     [0, -1, 0, -1, -1, -1, 0, 0, -1, 0],
+#     [54, -1, 51, -1, 0, -1, 0, -1, 0, 0],
+#     [0, 0, 0, 0, 0, -1, 0, -1, 0, 0],
+#     [0, -1, 50, -1, 20, -1, 10, -1, 0, 0],
+#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+# ]
 
-s_pos = (0, 0)
-e_pos = (9, 0)
+# s_pos = (0, 0)
+# e_pos = (9, 0)
 
-# Test3 for lvl3
+# Test 3 for lvl3
 #
 # board = [
 #     [0,    -1, "F1",  0, 0, -1, "F3", 0, 0, 0],
@@ -108,6 +108,45 @@ e_pos = (9, 0)
 # s_pos = (0, 0)
 # e_pos = (9, 0)
 
+# Test 4 for lvl3
+# board = [
+#     [0, 0, 0, 0, -1, -1, 0, 0, 0, 0],
+#     [0, 0, 0, 0, -1, 0, 0, -1, 0, -1],
+#     [0, 0, -1, -1, -1, 0, 0, -1, 0, -1],
+#     [0, 0, 0, 0, -1, 0, 0, -1, 0, 0],
+#     [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
+#     [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
+#     [0, 0, "F10", 0, -1, 5, -1, 0, -1, 0],
+#     [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
+#     [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
+#     [0, 0, 5, 0, 0, 0, -1, -1, -1, 0]
+# ]
+#case1: t = 20, f = 99
+#case2: t = 15, f = 99
+#case3: t = 25, f = 10
+#case4: t = 28, f = 10 
+# s_pos = (1, 1)
+# e_pos = (7, 6)
+
+# Test 5 for lvl3
+board = [
+    [0, 0, 0, 0, -1, -1, 0, 0, 0, 0],
+    [0, 0, 0, 0, -1, 0, 0, -1, 0, -1],
+    [0, 0, -1, -1, -1, 0, 0, -1, 0, -1],
+    [0, 0, "F1", "F2", -1, 0, 0, -1, 0, 0],
+    [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
+    [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
+    [0, 0, 0, 0, -1, 5, -1, 0, -1, 0],
+    [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
+    [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
+    [0, 0, 5, 0, 0, 0, -1, -1, -1, 0]
+]
+#case1: t = 99, f = 17
+#case2: t = 99, f = 18
+#NOTE: VERY TIME INTENSIVE IF THERE ARE MANY FUEL STATION IN RANGE OF FUEL CAP, MIGHT EDGE TEST LATER
+s_pos = (1, 1)
+e_pos = (9, 9)
+
 game_board = Board(10, 10, s_pos, e_pos)
 game_board.board_data = board
 
@@ -121,14 +160,14 @@ frame = 0
 auto_move = False
 running = True
 
-levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*')
+levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3')
 
-level = 'bfs'
+level = 'lvl3'
 
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
-get_path, get_expansion = game_board.configure_algorithm(level)
+get_path, get_expansion = game_board.configure_algorithm(level, 99, 18)
 # get_path, get_expansion = game_board.configure_algorithm('lvl2')
 # get_path, get_expansion = game_board.configure_algorithm()
 cost = algo.generate_time_cost(game_board.board_data, get_path)
