@@ -62,10 +62,32 @@ Screen offset: ({self.offset_x, self.offset_y})
         else:
             self.board_display_layout(screen, path, step, level)
 
-
     def import_board_data(self, filename):
-        f = open(filename, 'r')
         # Do the import data here
+        fs = open(filename, "r")
+        s_pos = (0, 0)
+        e_pos = (0, 0)
+
+        n, m, t, f = fs.readline().split()
+        adj = []
+        for _ in range(int(n)):
+            line = fs.readline().split()
+            temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric() else i for i in line]
+            if 'S' in temp:
+                s_pos = (temp.index('S'), _)
+                temp[s_pos[0]] = 0
+
+            if 'G' in temp:
+                e_pos = (temp.index('G'), _)
+                temp[e_pos[0]] = 0
+
+            adj.append(temp)
+        fs.close()
+
+        self.board_data = adj
+        self.start = s_pos
+        self.end = e_pos
+        self.size = (len(adj), len(adj[0]))
 
     def configure_algorithm(self, algorithm: str | Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs', limit=float('inf'), fuel_cap=float('inf')):
         if algorithm == 'bfs':
@@ -74,12 +96,12 @@ Screen offset: ({self.offset_x, self.offset_y})
             return algo.DFS(self.board_data, self.start, self.end)
         if algorithm == 'ucs':
             return algo.UCS(self.board_data, self.start, self.end)
-        if algorithm == 'gbfs' or algorithm == 'a*':
-            return algo.BestFS(self.board_data, self.start, self.end)
+        if algorithm == 'gbfs':
+            return algo.GBFS(self.board_data, self.start, self.end)
         elif algorithm == 'a*':
-            # Implement A* here
-            pass
+            return algo.A_STAR(self.board_data, self.start, self.end)
         if algorithm == 'lvl2':
+            self.time_limit = limit
             return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
         if algorithm == 'lvl3':
             self.time_limit = limit
