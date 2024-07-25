@@ -130,9 +130,9 @@ size_of_grid = (10, 10)
 
 # Test 5 for lvl3
 board = [
-    [0, 0, 0, 0, -1, -1, 0, 0, 0, 0],
-    [0, 0, 0, 0, -1, 0, 0, -1, 0, -1],
-    [0, 0, -1, -1, -1, 0, 0, -1, 0, -1],
+    [0, 0, -1, 0, -1, -1, 0, 0, 0, 0],
+    [0, 0, -1, 0, -1, 0, 0, -1, 0, -1],
+    [-1, -1, -1, -1, -1, 0, 0, -1, 0, -1],
     [0, 0, "F1", "F2", -1, 0, 0, -1, 0, 0],
     [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
     [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
@@ -176,10 +176,7 @@ cost = algo.generate_time_cost(game_board.board_data, get_path)
 algorithm = 0
 
 # game_board.board_layout_init()  # Uncomment to load textures
-# print(get_path)
 
-if get_path is None:
-    get_path = []
 # print(game_board)
 
 while running:
