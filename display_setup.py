@@ -262,18 +262,18 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_si
         stopped_time += 1
         current_block = board_data[path_movement[total_cost][0]][path_movement[total_cost][1]]
 
-        if int(str(current_block).strip('F')) + 1 == stopped_time:
+        if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
             stopped_time = 0
             total_cost += 1
             fuel_cost -= 1
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
 
-    current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  box_size // 3,
+    current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5))
-    time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", box_size // 3,
+    time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", 20,
                                           (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6))
-    current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", box_size // 3,
+    current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", 20,
                                                 (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7))
 
     scr.blits([
@@ -301,41 +301,28 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
 
     display_font = pygame.font.SysFont("comicsansms", box_size // 3)
     pygame.draw.rect(scr, (255, 255, 255),
-                     (scr_offset_x * 2 + box_size * grid_size[0], scr_offset_y, box_size * 4, box_size * grid_size[1]),
+                     (scr_offset_x * 2 + box_size * grid_size[0], scr_offset_y, 250, box_size * grid_size[1]),
                      width=2)
-    # start_value = display_font.render(f"Start: {start[0], start[1]}", True, (255, 255, 255))
-    # start_value_rect = start_value.get_rect()
-    # start_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10)
-    #
-    start_value, start_value_rect = draw_text(f"Start: {start[0], start[1]}", "comicsansms",  box_size // 3,
+
+    start_value, start_value_rect = draw_text(f"Start: {start[0], start[1]}", "comicsansms",  20,
                                               (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10))
     info_list.append((start_value, start_value_rect))
 
-    # end_value = display_font.render(f"End: {end[0], end[1]}", True, (255, 255, 255))
-    # end_value_rect = end_value.get_rect()
-    # end_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size)
-
-    end_value, end_value_rect = draw_text(f"End: {end[0], end[1]}", "comicsansms",  box_size // 3,
+    end_value, end_value_rect = draw_text(f"End: {end[0], end[1]}", "comicsansms",  20,
                                           (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size))
     info_list.append((end_value, end_value_rect))
 
     if level in ('lvl2', 'lvl3'):
-        # time_value = display_font.render(f"Time limit: {time_limit}", True, (255, 255, 255))
-        # time_value_rect = time_value.get_rect()
-        # time_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2)
-        time_value, time_value_rect = draw_text(f"Time limit: {time_limit}", "comicsansms",  box_size // 3,
+        time_value, time_value_rect = draw_text(f"Time limit: {time_limit}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2))
 
         info_list.append((time_value, time_value_rect))
     if level == 'lvl3':
-        # fuel_value = display_font.render(f"Fuel limit: {fuel_limit}", True, (255, 255, 255))
-        # fuel_value_rect = fuel_value.get_rect()
-        # fuel_value_rect.topleft = (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3)
-        fuel_value, fuel_value_rect = draw_text(f"Fuel limit: {fuel_limit}", "comicsansms",  box_size // 3,
+        fuel_value, fuel_value_rect = draw_text(f"Fuel limit: {fuel_limit}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3))
         info_list.append((fuel_value, fuel_value_rect))
 
-    alias_name, alias_name_rect = draw_text(level.upper(), "comicsansms",  box_size // 3,
+    alias_name, alias_name_rect = draw_text(level.upper(), "comicsansms",  20,
                                             (scr_offset_x * 2 + box_size * (grid_size[0] + 1.5) , scr_offset_y + 10 + box_size * 4))
     info_list.append((alias_name, alias_name_rect))
 
