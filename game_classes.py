@@ -4,7 +4,7 @@ import display_setup as ds
 
 
 class Board:
-    def __init__(self, grid_width, grid_height, start_pos, end_pos):  # Constructor
+    def __init__(self, grid_width = 0, grid_height = 0, start_pos = (0, 0), end_pos = (0, 0)):  # Constructor
         self.size = (grid_width, grid_height)
         self.board_data = [[0 for _ in range(grid_width)] for __ in range(grid_height)]
         self.start = start_pos
@@ -68,18 +68,19 @@ Screen offset: ({self.offset_x, self.offset_y})
         s_pos = (0, 0)
         e_pos = (0, 0)
 
-        n, m, t, f = fs.readline().split()
+        rows, cols, time, fuel = fs.readline().split()
         adj = []
-        for _ in range(int(n)):
+        for i in range(int(rows)):
             line = fs.readline().split()
             temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric() else i for i in line]
             if 'S' in temp:
-                s_pos = (temp.index('S'), _)
-                temp[s_pos[0]] = 0
+                s_pos = (i, temp.index('S'))
+                temp[s_pos[1]] = 0
 
             if 'G' in temp:
-                e_pos = (temp.index('G'), _)
-                temp[e_pos[0]] = 0
+                e_pos = (i, temp.index('G'))
+                temp[e_pos[1]] = 0
+                print(e_pos)
 
             adj.append(temp)
         fs.close()
@@ -87,9 +88,11 @@ Screen offset: ({self.offset_x, self.offset_y})
         self.board_data = adj
         self.start = s_pos
         self.end = e_pos
+        self.time_limit = int(time) if time != "inf" else float('inf')
+        self.fuel_limit = int(fuel) if fuel != "inf" else float('inf')
         self.size = (len(adj), len(adj[0]))
 
-    def configure_algorithm(self, algorithm: str | Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs', limit=float('inf'), fuel_cap=float('inf')):
+    def configure_algorithm(self, algorithm: str | Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs'):
         if algorithm == 'bfs':
             return algo.BFS(self.board_data, self.start, self.end)
         if algorithm == 'dfs':
@@ -101,9 +104,6 @@ Screen offset: ({self.offset_x, self.offset_y})
         elif algorithm == 'a*':
             return algo.A_STAR(self.board_data, self.start, self.end)
         if algorithm == 'lvl2':
-            self.time_limit = limit
-            return algo.LVL2_UCS(self.board_data, self.start, self.end, limit)
+            return algo.LVL2_UCS(self.board_data, self.start, self.end, self.time_limit)
         if algorithm == 'lvl3':
-            self.time_limit = limit
-            self.fuel_limit = fuel_cap
-            return algo.LVL3(self.board_data, self.start, self.end, limit, fuel_cap)
+            return algo.LVL3(self.board_data, self.start, self.end, self.time_limit, self.time_limit)

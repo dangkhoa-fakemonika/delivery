@@ -22,7 +22,7 @@ class MatrixGenerator:
             self.buttons.append(row_buttons)
         
         generate_button = tk.Button(self.root, text="Generate Matrix", command=self.generate_matrix)
-        quit_button = tk.Button(self.root, text="Quit", command=self.root.quit)
+        quit_button = tk.Button(self.root, text="Reset", command=self.reset)
         generate_button.grid(row=rows, columnspan=cols)
         quit_button.grid(row=rows+1, columnspan=cols + 1)
     
@@ -45,11 +45,18 @@ class MatrixGenerator:
                 
         self.output = self.output[:-1] + str(int(self.output[-1])+1)
         
-        
+    def reset(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                self.matrix[i, j] = 0    
+                self.buttons[i][j].config(bg="white")
+                
     def run(self):
         self.root.mainloop()
-
-# Example usage
-if __name__ == "__main__":
-    generator = MatrixGenerator(5, 5)  # Create a 5x5 matrix
+        
+def main():
+    generator = MatrixGenerator(20, 20)
     generator.run()
+    
+if __name__ == '__main__':
+    main()

@@ -144,11 +144,12 @@ board = [
 #case1: t = 99, f = 17
 #case2: t = 99, f = 18
 #NOTE: VERY TIME INTENSIVE IF THERE ARE MANY FUEL STATION IN RANGE OF FUEL CAP, MIGHT EDGE TEST LATER
-s_pos = (1, 1)
-e_pos = (9, 9)
+# s_pos = (1, 1)
+# e_pos = (9, 9)
 
-game_board = Board(10, 10, s_pos, e_pos)
-game_board.board_data = board
+game_board = Board()
+game_board.import_board_data("input/input_level3.txt")
+#game_board.board_data = board
 
 screen_res = (1020, 720)
 fps = 12
@@ -167,7 +168,7 @@ level = 'lvl3'
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
-get_path, get_expansion = game_board.configure_algorithm(level, 99, 18)
+get_path, get_expansion = game_board.configure_algorithm(level)
 # get_path, get_expansion = game_board.configure_algorithm('lvl2')
 # get_path, get_expansion = game_board.configure_algorithm()
 cost = algo.generate_time_cost(game_board.board_data, get_path)
