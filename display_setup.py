@@ -248,6 +248,14 @@ def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, sta
 
 
 def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
+
+    if path_movement is None:
+        invalid, invalid_rect = draw_text(f"No valid path.", "comicsansms",  20,
+                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5),
+                                          (255, 10, 10))
+        scr.blit(invalid, invalid_rect)
+        return 0
+
     total_cost = 0
     total_time = 0
     fuel_cost = fuel

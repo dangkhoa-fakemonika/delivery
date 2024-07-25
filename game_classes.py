@@ -37,7 +37,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         if step != 0 and st < len(path) - 1:
             ds.draw_board_data(screen, self.board_data, path[st], self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         else:
-            ds.draw_board_data(screen, self.board_data, self.start, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
+            ds.draw_board_data(screen, self.board_data, self.end, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_info_box(screen, self.start, self.end, level, self.time_limit, self.fuel_limit, self.size, self.box_size, self.offset_x, self.offset_y)
 
@@ -52,7 +52,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         if step != 0 and st < len(path) - 1:
             ds.draw_assets_board_data(screen, self.board_data, self.board_layout, path[st], self.end, self.size, self.box_size, algo.configure_path(path[st], path[st + 1]) ,self.offset_x, self.offset_y)
         else:
-            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, self.start, self.end, self.size, self.box_size, 0 ,self.offset_x, self.offset_y)
+            ds.draw_assets_board_data(screen, self.board_data, self.board_layout, self.end, self.end, self.size, self.box_size, 0 ,self.offset_x, self.offset_y)
         # ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_info_box(screen, self.start, self.end, level, self.time_limit, self.fuel_limit, self.size, self.box_size, self.offset_x, self.offset_y)
 
