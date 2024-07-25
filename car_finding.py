@@ -148,7 +148,7 @@ board = [
 # e_pos = (9, 9)
 
 game_board = Board()
-game_board.import_board_data("input/input_level3.txt")
+game_board.import_board_data("input/input_level1_nopath.txt")
 #game_board.board_data = board
 
 screen_res = (1020, 720)
@@ -163,7 +163,7 @@ running = True
 
 levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3')
 
-level = 'lvl3'
+level = 'bfs'
 
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
