@@ -4,3 +4,6 @@ tempCodeRunnerFile.py
 *.pyc
 *.pyc
 *.pyc
+__pycache__/display_setup.cpython-312.pyc
+__pycache__/game_classes.cpython-312.pyc
+__pycache__/search_algorithms.cpython-312.pyc
