@@ -269,58 +269,6 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                             return generate_path(reached, start, end), expansion
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
 
-
-# def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
-#     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
-#     frontier: list[tuple[int, int]] = [start]
-#     time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-#     road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-#     currentFuel = [[0 for _ in range(len(board_data))] for __ in range(len(board_data))]
-#     expansion: list[tuple[int, int]] = []
-
-#     time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
-#     road_cost[start[0]][start[1]] = 0
-#     currentFuel[start[0]][start[1]] = fuel_cap
-#     while True:
-        
-#         # No node can be explored
-#         if len(frontier) == 0:
-#             return None, expansion  
-        
-#         current_node = frontier.pop(0)
-        
-#         expansion.append(current_node) 
-#         if (current_node == end):
-#             return generate_path(reached, start, end), expansion
-        
-#         if time_cost[current_node[0]][current_node[1]] < limit and currentFuel[current_node[0]][current_node[1]] > 0:
-#             print(current_node, 'road: ', road_cost[current_node[0]][current_node[1]], ', time: ', time_cost[current_node[0]][current_node[1]], ', fuel: ', currentFuel[current_node[0]][current_node[1]])
-#             explored = generate_neighbor_LVL2(current_node, board_data, reached)
-#             for nods in explored:
-#                 if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
-#                     added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
-#                 else:
-#                     added_time_cost = board_data[nods[0]][nods[1]] + 1
-#                 if (
-#                     nods not in reached or 
-#                     time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + added_time_cost or
-#                     currentFuel[nods[0]][nods[1]] < currentFuel[current_node[0]][current_node[1]]
-#                 ):
-#                     if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
-#                         currentFuel[nods[0]][nods[1]] = fuel_cap
-#                     else:
-#                         currentFuel[nods[0]][nods[1]] = currentFuel[current_node[0]][current_node[1]] - 1
-
-#                     time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + added_time_cost
-#                     road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-
-#                     frontier.append(nods)
-#                     reached[nods] = current_node
-
-#                     if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-#                         return generate_path(reached, start, end), expansion
-#             frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
-
 def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
     for step in range (0, len(board_data) * len(board_data[0])):
         print('maxstep = ', step)
@@ -334,13 +282,14 @@ def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
 
 
 def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end: tuple[int, int], remaining_step: int, cur_time: int, time_limit: int, cur_fuel: int, fuel_cap: int, cur_path: list[int, int], reached: dict[tuple[int, int]: tuple[int, int]]):
+    #Base case
     if current == end:
         if cur_time <= time_limit:
             return True
         else:
             return False
-        
-    if remaining_step <= 0 or cur_fuel <= 0 or cur_time >= time_limit:
+    #If these conditions are violated, further exploration becomes meaningless because it's already an invalid path, so we return early
+    if remaining_step <= 0 or cur_fuel <= 0 or cur_time >= time_limit: 
         return False
     if str(board_data[current[0]][current[1]])[0] == 'F': #is a fuel station
         added_time_cost = int((board_data[current[0]][current[1]])[1:]) + 1
@@ -349,18 +298,18 @@ def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end
         added_time_cost = board_data[current[0]][current[1]] + 1
     explored = generate_neighbor_LVL3(current, board_data, reached, end)
     for nods in explored:
-        reached[nods] = current
-        if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
+        if str(board_data[nods[0]][nods[1]])[0] == 'F': #if it's a fuel station, we reset the reached map by create a new one in order to allow past tiles to be traversed
             new_reached: dict[tuple[int, int]: tuple[int, int]] = {nods: -1}
             cur_path.append(nods)
-            print('fuel station reached at', current, ', remaining step: ', remaining_step)
             if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, fuel_cap, fuel_cap, cur_path, new_reached):
                 return True
-            cur_path.pop()
             new_reached.pop(nods)
-        cur_path.append(nods)
-        if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, cur_fuel - 1, fuel_cap, cur_path, reached):
-            return True
-        reached.pop(nods)
-        cur_path.pop()
+            cur_path.pop()     
+        else: #default recursive case, call the recursion function on the neighbor tile with updated status(remaining step, current time, current fule)
+            reached[nods] = current
+            cur_path.append(nods)
+            if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, cur_fuel - 1, fuel_cap, cur_path, reached):
+                return True
+            reached.pop(nods)
+            cur_path.pop()
     return False

@@ -163,7 +163,7 @@ running = True
 
 levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3')
 
-level = 'bfs'
+level = 'lvl3'
 
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
