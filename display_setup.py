@@ -29,14 +29,14 @@ def draw_text(text, font_name, size, coordinate, color=(255, 255, 255)) -> tuple
     return display_text, display_text_rect
 
 
-def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_width, offset_x=0,
+def draw_board_data(scr: pygame.Surface, level, board_data, start, end, grid_size, box_width, offset_x=0,
                     offset_y=0):
     for ii in range(grid_size[0]):
         for it in range(grid_size[1]):
             if str(board_data[ii][it]) == '-1':
                 pygame.draw.rect(scr, (128, 128, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
-            elif str(board_data[ii][it])[0] == 'F':
+            elif str(board_data[ii][it])[0] == 'F' and level == 'lvl3':
                 pygame.draw.rect(scr, (200, 200, 0),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
                 box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'comicsansms',
@@ -44,7 +44,7 @@ def draw_board_data(scr: pygame.Surface, board_data, start, end, grid_size, box_
                 box_value_rect.center = (offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
                 scr.blit(box_value, box_value_rect)
 
-            elif str(board_data[ii][it]) > '0':
+            elif str(board_data[ii][it]) > '0' and level in ('lvl2', 'lvl3') and str(board_data[ii][it])[0] != 'F':
                 pygame.draw.rect(scr, (10, 200, 128),
                                  (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
                 box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'comicsansms',
@@ -158,7 +158,7 @@ def generate_layout(board_data, grid_size):
     return assets_layout
 
 
-def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, start, end, grid_size, box_width,
+def draw_assets_board_data(scr: pygame.Surface, level, board_data, assets_generate, start, end, grid_size, box_width,
                            direction, offset_x=0,
                            offset_y=0):
     display_font = pygame.font.SysFont("comicsansms", box_width // 2)
@@ -224,30 +224,32 @@ def draw_assets_board_data(scr: pygame.Surface, board_data, assets_generate, sta
                     (box_width, box_width))
                 scr.blit(road, (offset_x + it * box_width, offset_y + ii * box_width))
 
-    for ii in range(grid_size[0]):
-        for it in range(grid_size[1]):
-            if board_data[ii][it] > 0:
-                box_value, box_value_rect = draw_text(str(board_data[ii][it]), "comicsansms", box_width // 2, (0, 0))
-                box_value_rect.center = (
-                    offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
-                scr.blit(time_stop, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
-                scr.blit(box_value, box_value_rect)
+    if level in ('lvl2', 'lvl3'):
+        for ii in range(grid_size[0]):
+            for it in range(grid_size[1]):
+                if board_data[ii][it] > 0:
+                    box_value, box_value_rect = draw_text(str(board_data[ii][it]), "comicsansms", box_width // 2, (0, 0))
+                    box_value_rect.center = (
+                        offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+                    scr.blit(time_stop, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
+                    scr.blit(box_value, box_value_rect)
 
-    for f in fuels:
-        scr.blit(fuel_stop, (offset_x + (f[1] - 0.1) * box_width, offset_y + (f[0] - 0.1) * box_width))
-        # box_value = display_font.render(f[2], True, (255, 255, 255))
-        # box_value_rect = box_value.get_rect()
-        box_value, box_value_rect = draw_text(f[2], "comicsansms", box_width // 2, (0, 0))
-        box_value_rect.center = (
-            offset_x + f[1] * box_width + box_width // 2, offset_y + f[0] * box_width + box_width // 2)
-        board_data[f[0]][f[1]] = f[2]
-        scr.blit(box_value, box_value_rect)
+    if level == 'lvl3':
+        for f in fuels:
+            scr.blit(fuel_stop, (offset_x + (f[1] - 0.1) * box_width, offset_y + (f[0] - 0.1) * box_width))
+            # box_value = display_font.render(f[2], True, (255, 255, 255))
+            # box_value_rect = box_value.get_rect()
+            box_value, box_value_rect = draw_text(f[2], "comicsansms", box_width // 2, (0, 0))
+            box_value_rect.center = (
+                offset_x + f[1] * box_width + box_width // 2, offset_y + f[0] * box_width + box_width // 2)
+            board_data[f[0]][f[1]] = f[2]
+            scr.blit(box_value, box_value_rect)
 
     scr.blit(car, (offset_x + start[1] * box_width, offset_y + start[0] * box_width))
     scr.blit(end_point, (offset_x + end[1] * box_width, offset_y + end[0] * box_width))
 
 
-def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
+def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
 
     if path_movement is None:
         invalid, invalid_rect = draw_text(f"No valid path.", "comicsansms",  20,
@@ -270,25 +272,35 @@ def draw_step(scr: pygame.Surface, board_data, path_movement, time, fuel, box_si
         stopped_time += 1
         current_block = board_data[path_movement[total_cost][0]][path_movement[total_cost][1]]
 
-        if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
+        if level in ('bfs', 'dfs', 'ucs', 'gbfs', 'a*'):
+            total_cost += 1
+
+        elif level == 'lvl2':
+            if str(current_block)[0] == 'F' or int(str(current_block).strip('F')) + 1 == stopped_time:
+                stopped_time = 0
+                total_cost += 1
+
+        elif level == 'lvl3' and int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
             stopped_time = 0
             total_cost += 1
             fuel_cost -= 1
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
 
+    info = []
     current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5))
-    time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", 20,
+    info.append((current_cost, current_cost_rect))
+    if level in ('lvl2', 'lvl3'):
+        time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", 20,
                                           (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6))
-    current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", 20,
-                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7))
+        info.append((time_cost, time_cost_rect))
+    if level == 'lvl3':
+        current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", 20,
+                                                    (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7))
+        info.append((current_fuel, current_fuel_rect))
 
-    scr.blits([
-        (current_cost, current_cost_rect),
-        (time_cost, time_cost_rect),
-        (current_fuel, current_fuel_rect)
-    ])
+    scr.blits(info)
 
     return total_cost
 

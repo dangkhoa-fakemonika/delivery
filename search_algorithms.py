@@ -22,7 +22,7 @@ def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
             0 <= x < len(board_data) and
             0 <= y < len(board_data[0]) and
             (x, y) not in reached and
-            board_data[x][y] >= 0
+            board_data[x][y] != -1
         ):
 
             explored.append((x, y))
@@ -48,6 +48,7 @@ def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
 
     return explored
 
+
 def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, goal):
     neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
     explored = []
@@ -64,6 +65,7 @@ def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, go
     explored.sort(key=lambda x: abs(goal[0] - x[0]) + abs(goal[1] - x[1])) #prioritize tile closer to goal based on manhattan distance 
     return explored
 
+
 def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: tuple[int, int], end: tuple[int, int]):
     # path_move = []
     path_block = []
@@ -77,14 +79,18 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
             return path_block  # path_move
 
 
-def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]]):
+def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]], level):
     if path is None:
         return 0
-    total_time = 0
-    for step in path:
-        total_time += int(str(board_data[step[0]][step[1]]).strip('F')) + 1
+    total_time = len(path) - 1
 
-    return total_time - 1
+    for step in path:
+        if level in ('lvl2', 'lvl3') and str(board_data[step[0]][step[1]])[0] != 'F':
+            total_time += board_data[step[0]][step[1]]
+        elif level == 'lvl3' and str(board_data[step[0]][step[1]])[0] == 'F':
+            total_time += int(str(board_data[step[0]][step[1]]).strip('F')) + 1
+
+    return total_time
 
 
 def BFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
@@ -156,10 +162,10 @@ def UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
             return generate_path(reached, start, end), expansion
 
         for nods in explored:
-            if nods not in reached or road_cost[nods[0]][nods[1]] > road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]]:
+            if nods not in reached or road_cost[nods[0]][nods[1]] > road_cost[current_node[0]][current_node[1]] + 1:
                 frontier.append(nods)
                 reached[nods] = current_node
-                road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]]
+                road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
         
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
             
@@ -171,7 +177,6 @@ def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
     expansion: list[tuple[int, int]] = []
-
 
     while True:
         # No node can be explored
@@ -191,6 +196,7 @@ def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
                     return generate_path(reached, start, end), expansion
 
         frontier.sort(key=lambda x: abs(end[0] - x[0]) + abs(end[1] - x[1])) # Manhattan distance
+
 
 def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
@@ -213,7 +219,7 @@ def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
             return generate_path(reached, start, end), expansion
 
         for nods in explored:
-            new_cost = road_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
+            new_cost = road_cost[current_node[0]][current_node[1]] + 1
             if nods not in reached or road_cost[nods[0]][nods[1]] > new_cost:
                 frontier.append(nods)
                 reached[nods] = current_node
@@ -245,13 +251,22 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
         if time_cost[current_node[0]][current_node[1]] < limit:
             explored = generate_neighbor_LVL2(current_node, board_data, reached)
             for nods in explored:
-                if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can re-visited if the new time_cost is better
-                    time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
-                    road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-                    frontier.append(nods)
-                    reached[nods] = current_node
-                    if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-                        return generate_path(reached, start, end), expansion
+                if str(board_data[nods[0]][nods[1]])[0] != 'F':
+                    if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can re-visited if the new time_cost is better
+                        time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
+                        road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+                        frontier.append(nods)
+                        reached[nods] = current_node
+                        if nods == end and time_cost[nods[0]][nods[1]] <= limit:
+                            return generate_path(reached, start, end), expansion
+                else:
+                    if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + 1:  # add this so that reached tile can re-visited if the new time_cost is better
+                        time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + 1
+                        road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+                        frontier.append(nods)
+                        reached[nods] = current_node
+                        if nods == end and time_cost[nods[0]][nods[1]] <= limit:
+                            return generate_path(reached, start, end), expansion
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
 
 
