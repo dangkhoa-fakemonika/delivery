@@ -82,7 +82,7 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
 def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]], level):
     if path is None:
         return 0
-    total_time = len(path) - 2
+    total_time = len(path) - 1
 
     for step in path:
         if level in ('lvl2', 'lvl3') and str(board_data[step[0]][step[1]])[0] != 'F':

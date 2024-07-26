@@ -263,7 +263,7 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
     fuel_cost = fuel
     stopped_time = 0
 
-    while total_time < time:
+    while total_time < time - 1:
         pygame.draw.rect(scr, (0, 128, 128),
                          (scr_offset_x + path_movement[total_cost][1] * box_size,
                           scr_offset_y + path_movement[total_cost][0] * box_size,
