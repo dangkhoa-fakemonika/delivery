@@ -31,26 +31,6 @@ def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
 
     return explored
 
-
-def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
-    neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
-    explored = []
-
-    for neighbor in neighbors:
-        x, y = block[0] + neighbor[0], block[1] + neighbor[1]
-
-        if (
-            0 <= x < len(board_data) and
-            0 <= y < len(board_data[0]) and 
-
-            #(x, y) not in reached  and //// now its alway generate 4 surrounding drivable tile
-            str(board_data[x][y]) >= '0'
-        ):
-            explored.append((x, y))
-
-    return explored
-
-
 def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, goal):
     neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
     explored = []
@@ -319,7 +299,7 @@ def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end
     return False
 
 # Still in progress
-def LVL3(board_data, start, end, time_limit=float('inf'), fuel_cap=float('inf')):
+def LVL3_UCS(board_data, start, end, time_limit=float('inf'), fuel_cap=float('inf')):
     rows, cols = len(board_data), len(board_data[0])
     
     # Priority queue: (priority, path cost, time, fuel, current_position, path)
