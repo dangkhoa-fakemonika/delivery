@@ -50,13 +50,47 @@ class MatrixGenerator:
             for j in range(self.cols):
                 self.matrix[i, j] = 0    
                 self.buttons[i][j].config(bg="white")
+    
+    def load_matrix(self, filename):
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+            self.rows = int(lines[0].split()[0])
+            self.cols = int(lines[0].split()[1])
+            self.matrix = np.zeros((self.rows, self.cols), dtype=int)
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    self.matrix[i, j] = int(lines[i+1].split()[j])
+                    if self.matrix[i, j] == -1:
+                        self.buttons[i][j].config(bg="black")
+                    else:
+                        self.buttons[i][j].config(bg="white")
+                    
                 
     def run(self):
         self.root.mainloop()
         
+board = [
+    [0, 0, -1, 0, -1, -1, 0, 0, 0, 0],
+    [0, "S", -1, 0, -1, 0, 0, -1, 0, -1],
+    [-1, -1, -1, -1, -1, 0, 0, -1, 0, -1],
+    [0, 0, "F1", "F2", -1, 0, 0, -1, 0, 0],
+    [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
+    [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
+    [0, 0, 0, 0, -1, 5, -1, 0, -1, 0],
+    [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
+    [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
+    [0, 0, 5, 0, 0, 0, -1, -1, -1, "G"]
+]
+       
 def main():
-    generator = MatrixGenerator(20, 20)
-    generator.run()
+    # generator = MatrixGenerator(20, 20)
+    # generator.load_matrix("input/input_level1_maze.txt")
+    # generator.run()
+    print(len(board), len(board[0]), "99 18")
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            print(board[i][j], end=" ")
+        print()
     
 if __name__ == '__main__':
     main()
