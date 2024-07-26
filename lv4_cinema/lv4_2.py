@@ -1,3 +1,5 @@
+import random
+
 import lv4 as l4
 
 
@@ -12,6 +14,7 @@ class GridLV4:
         self.time_limit: float | int = float('inf')
         self.fuel_limit: float | int = float('inf')
         self.current_fuel: list[float | int] | None = None
+        self.paying_toll: list[int | float] | None = None
 
     def init_path(self):
         for i in range(len(self.starts)):
@@ -34,6 +37,7 @@ class GridLV4:
         self.time_limit = time_limit
         self.fuel_limit = fuel_limit
         self.current_fuel = [fuel_limit for _ in range(self.agents_count)]
+        self.paying_toll = [0 for _ in range(self.agents_count)]
 
     def algo1(self):
 
@@ -67,6 +71,39 @@ class GridLV4:
                     continue
 
                 print("Current location:", self.paths[a][t])
+
+                if self.paths[a][t] == (-1, -1):
+                    print("This agent is paying his debt of his afterlife.")
+                    self.paying_toll[a] = float('inf')
+                    self.paths[a].append((-1, -1))
+
+                if self.paying_toll[a] > 0:  # Is waiting
+                    print("Is paying road toll")
+                    self.paying_toll[a] -= 1
+                    continue
+                elif str(self.grid_data[self.paths[a][t][0]][self.paths[a][t][1]]) > '0': # Will wait
+                    self.paying_toll[a] = int(str(self.grid_data[self.paths[a][t][0]][self.paths[a][t][1]]).strip('F'))
+                    continue
+
+                if self.paths[a][t] == self.goals[a]:
+                    if a != 0:
+                        print("Goal reached, generating a new one.")
+                        new_goal = self.goals[a]
+                        while new_goal in self.goals or str(self.grid_data[new_goal[0]][new_goal[1]]) != '-1' or new_goal in [self.paths[_][t] for _ in range(self.agents_count)]:
+                            new_goal = (
+                                random.randint(0, len(self.grid_data) - 1),
+                                random.randint(0, len(self.grid_data[0]) - 1)
+                            )
+                        new_path = l4.LVL3(self.grid_data, self.goals[a], new_goal, self.time_limit, self.fuel_limit)
+                        if new_path is None:
+                            self.paths[a].append((-1, -1))
+                        else:
+                            self.paths[a].extend(l4.get_timed_path(self.grid_data, new_path))
+                        print("Goal is generated at:", new_goal)
+                        self.goals[a] = new_goal
+                    if a == 0:
+                        return self.paths
+
                 # Find candidate directions that current agent can move to
                 cans = l4.generate_candidates_LVL4(self.paths[a][t], self.grid_data, self.goals[a], break_stalemate)
 
@@ -101,7 +138,7 @@ class GridLV4:
                     self.current_fuel[a] -= 1
                     best_path = []
 
-                    cans_set =[
+                    cans_set = [
                         [_ for _ in cans if _ not in self.paths[a]], # New candidates
                         [_ for _ in cans if _ in self.paths[a]] # Old candidates
                     ]
@@ -134,7 +171,7 @@ class GridLV4:
                     stalemate = False
                     # Rewrite its path
                     print("Can move with ", best_path)
-                    self.paths[a][t+1:] = best_path
+                    self.paths[a][t+1:] = l4.get_timed_path(self.grid_data, best_path)
                     print("Moved to", best_path[0])
 
                     if a == 0:  # Main agent
@@ -147,7 +184,7 @@ class GridLV4:
                         self.current_fuel[a] -= 1
 
             t += 1
-            break_stalemate = stalemate
+            break_stalemate = stalemate or (0 not in set(self.paying_toll) and len(self.paying_toll) > 1)
 
 
 test = GridLV4()

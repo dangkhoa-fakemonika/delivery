@@ -203,17 +203,16 @@ def LVL4_EXTREME(board_data: list[list[int]], starts: list[tuple[int, int]], end
 # #     [0, 0, 0, 0, 0, 0, -1, -1, -1, 0],
 # # ]
 #
-# graph = [
-#     [0, 0, 0, 0, 0],
-#     [-1, -1, 0, -1, -1],
-#     [0, 0, 0, 0, 0],
-#     [-1, -1, 0, -1, -1],
-#     [0, 0, 0, 0, 0]
-# ]
-#
+graph = [
+    [0, 3, 0, 2, 0]
+]
+
 # starts = [(0, 0), (2, 0), (4, 0)]
 # ends = [(2, 4), (4, 4), (0, 4)]
 #
+
+# print(get_timed_path(graph, [(0, 0), (0, 1) , (0, 2), (0, 3), (0, 4)]))
+
 # LVL4_EXTREME(graph, starts, ends)
 #
 #
