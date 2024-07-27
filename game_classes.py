@@ -98,7 +98,8 @@ class GridLV4:
                                          ]
                         while new_path is None:
                             new_goal = random.choice(can_locations)
-                            new_path = l4.LVL4(self.grid_data, self.goals[a], new_goal, self.time_limit, self.current_fuel[a])
+                            # new_path = l4.LVL4(self.grid_data, self.goals[a], new_goal, self.time_limit, self.current_fuel[a])
+                            new_path = algo.LVL4(self.grid_data, self.goals[a], new_goal, self.time_limit, self.current_fuel[a])
                             if new_path is None:
                                 can_locations.remove(new_goal)
 
@@ -150,9 +151,9 @@ class GridLV4:
                         new_flag = False
                         for can in cset:
                             if str(self.grid_data[can[0]][can[1]]) == 'F':
-                                temp_path = l4.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.fuel_limit)
+                                temp_path = algo.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.fuel_limit)
                             else:
-                                temp_path = l4.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.current_fuel[a])
+                                temp_path = algo.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.current_fuel[a])
 
                             if temp_path is None:
                                 continue

@@ -432,18 +432,18 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
 def LVL4(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
                fuel_cap=float('inf'), current_fuel=float('inf')):
     path = []
-    if LVL3_Recursive_alter(board_data, start, end, time_limit, fuel_cap, path):
-        return path, None
+    if LVL4_Recursive_alter(board_data, start, end, time_limit, fuel_cap, path):
+        return path
 
-    return None, None
+    return None
 
 
 def LVL4_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit: int,
                          fuel_cap: int, cur_path: list[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
-    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    time_cost = [[float('inf') for _ in range(len(board_data[0]))] for __ in range(len(board_data))]
+    road_cost = [[float('inf') for _ in range(len(board_data[0]))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
     candidate: list[tuple[int, int]] = []
     shortest_path: list[tuple[int, int]] = []
@@ -485,7 +485,7 @@ def LVL4_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
     for nods in candidate:
         temp_path = []
         if LVL4_Recursive_alter(board_data, nods, end, time_limit - (time_cost[nods[0]][nods[1]] - 1), fuel_cap,
-                                temp_path):
+                                temp_path, current_fuel - 1):
             new_path = generate_path(reached, start, nods)
             new_path.pop()
             new_path += temp_path
