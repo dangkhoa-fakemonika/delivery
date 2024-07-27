@@ -64,6 +64,9 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
 def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]], level):
     if path is None:
         return 0
+    if level == 'lvl4':
+        return len(path[0])
+
     total_time = len(path) - 1
 
     for step in path:
@@ -126,7 +129,7 @@ def DFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int
 def UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    road_cost = [[float('inf') for _ in range(len(board_data[0]))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
 
     road_cost[start[0]][start[1]] = 0
@@ -183,7 +186,7 @@ def GBFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, in
 def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
     frontier: list[tuple[int, int]] = [start]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    road_cost = [[float('inf') for _ in range(len(board_data[0]))] for __ in range(len(board_data))]
     expansion: list[tuple[int, int]] = []
 
     road_cost[start[0]][start[1]] = 0 

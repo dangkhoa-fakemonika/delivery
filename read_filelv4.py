@@ -1,8 +1,8 @@
 input_dir = 'input_lv4.txt'
 fs = open(input_dir, "r")
 
-s_list = [(-1,-1)] * 10
-g_list = [(-1,-1)] * 10
+s_list = [(-1, -1)] * 10
+g_list = [(-1, -1)] * 10
 
 n, m, t, f = fs.readline().split()
 adj = []

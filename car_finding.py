@@ -148,9 +148,10 @@ board = [
 # e_pos = (9, 9)
 
 game_board = Board()
-game_board.import_board_data("input/input_level3.txt")
+game_board.import_board_data("input/input_level4.txt")
 #game_board.board_data = board
 
+print(game_board)
 screen_res = (1020, 720)
 fps = 12
 pyclock = pygame.time.Clock()
@@ -161,19 +162,21 @@ frame = 0
 auto_move = False
 running = True
 
-levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3')
+levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3', 'lvl4')
 
-level = 'lvl3'
+level = 'bfs'
 
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
 pygame.display.set_caption("lmao")
-get_path, get_expansion = game_board.configure_algorithm(level)
+game_board.run_algorithms()
+
+get_path = game_board.configure_algorithm(level)
 # get_path, get_expansion = game_board.configure_algorithm('lvl2')
 # get_path, get_expansion = game_board.configure_algorithm()
 cost = algo.generate_time_cost(game_board.board_data, get_path, level)
 
-algorithm = 0
+algorithm = levels.index(level)
 
 # game_board.board_layout_init()  # Uncomment to load textures
 
@@ -206,23 +209,23 @@ while running:
             if event.key == pygame.K_LEFT:
                 algorithm -= 1
                 if algorithm < 0:
-                    algorithm = 6
+                    algorithm = 7
                 path_steps = 0
                 expansion_steps = 0
                 # Change algorithm here
                 level = levels[algorithm]
-                get_path, get_expansion = game_board.configure_algorithm(level)
+                get_path = game_board.configure_algorithm(level)
                 cost = algo.generate_time_cost(game_board.board_data, get_path, level)
 
             if event.key == pygame.K_RIGHT:
                 algorithm += 1
-                if algorithm > 6:
+                if algorithm > 7:
                     algorithm = 0
                 path_steps = 0
                 expansion_steps = 0
                 # Change algorithm here
                 level = levels[algorithm]
-                get_path, get_expansion = game_board.configure_algorithm(level)
+                get_path = game_board.configure_algorithm(level)
                 cost = algo.generate_time_cost(game_board.board_data, get_path, level)
 
     if frame == fps:
@@ -233,6 +236,7 @@ while running:
         if path_steps > cost:
             path_steps = 0
 
+    # print(algorithm)
     # game_board.board_search(screen, get_expansion, expansion_steps, level)
     game_board.board_display(screen, get_path, path_steps, level)
     pygame.display.flip()

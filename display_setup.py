@@ -234,23 +234,20 @@ def draw_assets_board_data(scr: pygame.Surface, level, board_data, assets_genera
                     scr.blit(time_stop, (offset_x + (it - 0.1) * box_width, offset_y + (ii - 0.1) * box_width))
                     scr.blit(box_value, box_value_rect)
 
-    if level == 'lvl3':
-        for f in fuels:
+    for f in fuels:
+        if level == 'lvl3':
             scr.blit(fuel_stop, (offset_x + (f[1] - 0.1) * box_width, offset_y + (f[0] - 0.1) * box_width))
-            # box_value = display_font.render(f[2], True, (255, 255, 255))
-            # box_value_rect = box_value.get_rect()
             box_value, box_value_rect = draw_text(f[2], "comicsansms", box_width // 2, (0, 0))
             box_value_rect.center = (
                 offset_x + f[1] * box_width + box_width // 2, offset_y + f[0] * box_width + box_width // 2)
-            board_data[f[0]][f[1]] = f[2]
             scr.blit(box_value, box_value_rect)
+        board_data[f[0]][f[1]] = f[2]
 
     scr.blit(car, (offset_x + start[1] * box_width, offset_y + start[0] * box_width))
     scr.blit(end_point, (offset_x + end[1] * box_width, offset_y + end[0] * box_width))
 
 
 def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
-
     if path_movement is None:
         invalid, invalid_rect = draw_text(f"No valid path.", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5),
@@ -280,13 +277,14 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
                 stopped_time = 0
                 total_cost += 1
 
-        elif level == 'lvl3' and int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
-            stopped_time = 0
-            total_cost += 1
-            fuel_cost -= 1
+        elif level == 'lvl3':
+            if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
+                stopped_time = 0
+                total_cost += 1
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
-
+            else:
+                fuel_cost -= 1
     info = []
     current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5))
@@ -332,12 +330,12 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
                                           (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size))
     info_list.append((end_value, end_value_rect))
 
-    if level in ('lvl2', 'lvl3'):
+    if level in ('lvl2', 'lvl3', 'lvl4'):
         time_value, time_value_rect = draw_text(f"Time limit: {time_limit}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2))
 
         info_list.append((time_value, time_value_rect))
-    if level == 'lvl3':
+    if level in ('lvl3', 'lvl4'):
         fuel_value, fuel_value_rect = draw_text(f"Fuel limit: {fuel_limit}", "comicsansms",  20,
                                                 (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3))
         info_list.append((fuel_value, fuel_value_rect))
@@ -346,16 +344,83 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
                                             (scr_offset_x * 2 + box_size * (grid_size[0] + 1.5) , scr_offset_y + 10 + box_size * 4))
     info_list.append((alias_name, alias_name_rect))
 
-    if alias_name not in ('lvl2', 'lvl3'):
-        pygame.draw.polygon(scr, (255, 255, 255), [
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 10 + box_size * 4),
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 10, scr_offset_y + 20 + box_size * 4),
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 30 + box_size * 4),
-        ])
-        pygame.draw.polygon(scr, (255, 255, 255), [
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 10 + box_size * 4),
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 20, scr_offset_y + 20 + box_size * 4),
-            (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 30 + box_size * 4),
-        ])
+    pygame.draw.polygon(scr, (255, 255, 255), [
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 10 + box_size * 4),
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 10, scr_offset_y + 20 + box_size * 4),
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 30 + box_size * 4),
+    ])
+    pygame.draw.polygon(scr, (255, 255, 255), [
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 10 + box_size * 4),
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 20, scr_offset_y + 20 + box_size * 4),
+        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 30 + box_size * 4),
+    ])
 
     scr.blits(info_list)
+
+
+# Lv4 territory
+
+def draw_lv4_step(scr: pygame.Surface, agents_count, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
+    if path_movement[0] is None:
+        invalid, invalid_rect = draw_text(f"No valid path for main agent.", "comicsansms",  20,
+                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5),
+                                          (255, 10, 10))
+        scr.blit(invalid, invalid_rect)
+        return
+
+    for a in range(agents_count):
+        for m in range(time):
+            pygame.draw.rect(scr, (0, 128, 128),
+                             (scr_offset_x + path_movement[a][m][1] * box_size,
+                              scr_offset_y + path_movement[a][m][0] * box_size,
+                              box_size, box_size))
+
+    info = []
+
+
+def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, end, grid_size, box_width, offset_x=0,
+                    offset_y=0):
+
+    for ii in range(grid_size[0]):
+        for it in range(grid_size[1]):
+            if str(board_data[ii][it]) == '-1':
+                pygame.draw.rect(scr, (128, 128, 128),
+                                 (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+            elif str(board_data[ii][it])[0] == 'F':
+                pygame.draw.rect(scr, (200, 200, 0),
+                                 (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+                box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'comicsansms',
+                                                      box_width // 2, (0, 0))
+                box_value_rect.center = (
+                offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+                scr.blit(box_value, box_value_rect)
+
+            elif str(board_data[ii][it]) > '0' and str(board_data[ii][it])[0] != 'F':
+                pygame.draw.rect(scr, (10, 200, 128),
+                                 (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width))
+                box_value, box_value_rect = draw_text(str(board_data[ii][it]), 'comicsansms',
+                                                      box_width // 2, (0, 0))
+                box_value_rect.center = (
+                offset_x + it * box_width + box_width // 2, offset_y + ii * box_width + box_width // 2)
+
+                scr.blit(box_value, box_value_rect)
+
+    agent_color = (
+        (255, 0, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (255, 255, 0),
+        (255, 0, 255),
+        (0, 255, 255),
+        (128, 255, 0),
+        (128, 0, 255),
+        (255, 128, 0),
+        (0, 128, 255)
+    )
+
+    for i in range(agents_count):
+        pygame.draw.circle(scr, agent_color[i],
+                         (offset_x + (start[i][1] + .5) * box_width, offset_y + (start[i][0] + .5) * box_width), box_width / 2)
+
+        pygame.draw.rect(scr, agent_color[i],
+                         (offset_x + end[i][1] * box_width, offset_y + end[i][0] * box_width, box_width, box_width))
