@@ -48,6 +48,20 @@ def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, go
     explored.sort(key=lambda x: abs(goal[0] - x[0]) + abs(goal[1] - x[1])) #prioritize tile closer to goal based on manhattan distance 
     return explored
 
+def generate_neighbor_LVL3_alter(block: tuple[int, int], board_data, reached: dict, goal):
+    neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    explored = []
+
+    for neighbor in neighbors:
+        x, y = block[0] + neighbor[0], block[1] + neighbor[1]
+        if (
+            0 <= x < len(board_data) and
+            0 <= y < len(board_data[0]) and 
+            #(x, y) not in reached and
+            str(board_data[x][y]) >= '0'
+        ):
+            explored.append((x, y))
+    return explored
 
 def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: tuple[int, int], end: tuple[int, int]):
     # path_move = []
@@ -374,7 +388,7 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
         current_node = frontier.pop(0)
         expansion.append(current_node)
         if time_cost[current_node[0]][current_node[1]] < time_limit and road_cost[current_node[0]][current_node[1]] < fuel_cap:
-            explored = generate_neighbor_LVL3(current_node, board_data, reached, end)
+            explored = generate_neighbor_LVL3_alter(current_node, board_data, reached, end)
             for nods in explored:
                 if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
                     added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
@@ -388,7 +402,7 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
                         frontier.append(nods)
                         if nods == end and time_cost[nods[0]][nods[1]] <= time_limit:
                             cur_path += generate_path(reached, start, end)
-                            if len(shortest_path) == 0 or len(shortest_path) > len(cur_path):
+                            if len(shortest_path) == 0 or len(shortest_path) > len(cur_path):           
                                 shortest_path = copy.deepcopy(cur_path)
                     else:
                         candidate.append(nods)
@@ -400,7 +414,7 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
             new_path.pop()
             new_path += temp_path
             if len(shortest_path) == 0 or len(shortest_path) > len(new_path):
-                shortest_path = new_path
+                shortest_path = copy.deepcopy(new_path)
     if (len(shortest_path) != 0):
         cur_path.clear()
         cur_path += shortest_path
