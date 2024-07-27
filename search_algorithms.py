@@ -1,3 +1,5 @@
+import heapq
+
 def configure_path(move_1: tuple[int, int], move_2: tuple[int, int]):
     if move_1 == -1:
         return 0
@@ -28,26 +30,6 @@ def generate_neighbor(block: tuple[int, int], board_data, reached: dict):
             explored.append((x, y))
 
     return explored
-
-
-def generate_neighbor_LVL2(block: tuple[int, int], board_data, reached: dict):
-    neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
-    explored = []
-
-    for neighbor in neighbors:
-        x, y = block[0] + neighbor[0], block[1] + neighbor[1]
-
-        if (
-            0 <= x < len(board_data) and
-            0 <= y < len(board_data[0]) and 
-
-            #(x, y) not in reached  and //// now its alway generate 4 surrounding drivable tile
-            str(board_data[x][y]) >= '0'
-        ):
-            explored.append((x, y))
-
-    return explored
-
 
 def generate_neighbor_LVL3(block: tuple[int, int], board_data, reached: dict, goal):
     neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
@@ -228,46 +210,48 @@ def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]] + abs(end[0] - x[0]) + abs(end[1] - x[1])) # F = G + H  
 
 
-def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf')):
-    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
-    frontier: list[tuple[int, int]] = [start]
-    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    expansion: list[tuple[int, int]] = []
+def LVL2_UCS(board_data : list[list[int]], start : tuple[int, int], end : tuple[int, int], time_limit=float('inf')):
+    rows, cols = len(board_data), len(board_data[0])
+    
+    # Priority queue: (path_cost, time, current_position, path)
+    pq = [(0, 0, start, [])]
+    reached = set()
 
-    time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
-    road_cost[start[0]][start[1]] = 0
-
-    while True:
-        # No node can be explored
-        if len(frontier) == 0:
-            return None, expansion  
+    while pq:
+        path_cost, time, current, path = heapq.heappop(pq)
         
-        current_node = frontier.pop(0)
-        expansion.append(current_node) 
-        if current_node == end:
-            return generate_path(reached, start, end), expansion
+        if current == end and time <= time_limit:
+            print(f"Path cost: {path_cost}, Time: {time}")
+            return path + [current], []
         
-        if time_cost[current_node[0]][current_node[1]] < limit:
-            explored = generate_neighbor_LVL2(current_node, board_data, reached)
-            for nods in explored:
-                if str(board_data[nods[0]][nods[1]])[0] != 'F':
-                    if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1: # add this so that reached tile can re-visited if the new time_cost is better
-                        time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + board_data[nods[0]][nods[1]] + 1
-                        road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-                        frontier.append(nods)
-                        reached[nods] = current_node
-                        if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-                            return generate_path(reached, start, end), expansion
+        if (current, path_cost) in reached or time > time_limit:
+            continue
+        
+        reached.add((current, path_cost))
+        
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < rows and 0 <= ny < cols:
+                new_pos = (nx, ny)
+                cell = board_data[nx][ny]
+                
+                # Skip blocked cells
+                if cell == -1:
+                    continue
+                
+                new_path_cost = path_cost + 1
+                
+                # Ignore gas station
+                if str(cell)[0] == 'F':
+                    new_time = time + 1
                 else:
-                    if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + 1:  # add this so that reached tile can re-visited if the new time_cost is better
-                        time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + 1
-                        road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-                        frontier.append(nods)
-                        reached[nods] = current_node
-                        if nods == end and time_cost[nods[0]][nods[1]] <= limit:
-                            return generate_path(reached, start, end), expansion
-        frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+                    new_time = time + cell + 1
+                
+                if new_time <= time_limit:
+                    new_path = path + [current]
+                    heapq.heappush(pq, (new_path_cost, new_time, new_pos, new_path))
+    
+    return None, None
 
 def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
     for step in range (0, len(board_data) * len(board_data[0])):
@@ -313,3 +297,48 @@ def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end
             reached.pop(nods)
             cur_path.pop()
     return False
+
+# Still in progress
+def LVL3_UCS(board_data, start, end, time_limit=float('inf'), fuel_cap=float('inf')):
+    rows, cols = len(board_data), len(board_data[0])
+    
+    # Priority queue: (priority, path cost, time, fuel, current_position, path)
+    pq = [(0, 0, 0, fuel_cap, start, [])]
+    visited = set()
+
+    while pq:
+        _, path_cost, time, fuel, current, path = heapq.heappop(pq)
+        
+        if current == end and time <= time_limit:
+            return path + [current], []
+        
+        if (current, fuel) in visited or time > time_limit or fuel < 0:
+            continue
+        
+        visited.add((current, fuel))
+        
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < rows and 0 <= ny < cols:
+                new_pos = (nx, ny)
+                cell = board_data[nx][ny]
+                
+                # Skip blocked cells
+                if cell == -1:
+                    continue
+                
+                if str(cell)[0] == 'F':
+                    new_fuel = fuel_cap
+                    new_time = time + int(str(cell)[1:]) + 1
+                else:
+                    new_fuel = fuel - 1
+                    new_time = time + cell
+                    new_path_cost = path_cost + 1
+                
+                if new_time <= time_limit and new_fuel >= 0:
+                    new_path = path + [current]
+                    # Priority considers path cost, and remaining fuel
+                    priority = path_cost - (new_fuel / fuel_cap)
+                    heapq.heappush(pq, (priority, new_path_cost, new_time, new_fuel, new_pos, new_path))
+    
+    return None, None  # No path found

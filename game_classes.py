@@ -104,6 +104,6 @@ Screen offset: ({self.offset_x, self.offset_y})
         elif algorithm == 'a*':
             return algo.A_STAR(self.board_data, self.start, self.end)
         if algorithm == 'lvl2':
-            return algo.LVL3(self.board_data, self.start, self.end, self.time_limit)
+            return algo.LVL2_UCS(self.board_data, self.start, self.end, self.time_limit)
         if algorithm == 'lvl3':
             return algo.LVL3(self.board_data, self.start, self.end, self.time_limit, self.fuel_limit)
