@@ -41,12 +41,19 @@ class GridLV4:
         self.current_fuel = [fuel_limit for _ in range(self.agents_count)]
         self.paying_toll = [0 for _ in range(self.agents_count)]
 
+    def get_poss(self, time):
+        if 0 <= time < self.main_time:
+            return [self.paths[_][time] for _ in range(self.agents_count)]
+        else:
+            return [self.paths[_][self.main_time - 1] for _ in range(self.agents_count)]
+
     def algo1(self):
 
         # From the start, initiate all new part of the goal
         # A goal will move through its next step if it is not blocked
         stalemate = True
         break_stalemate = False
+        repetitive = False
 
         self.init_path()
 
@@ -59,7 +66,7 @@ class GridLV4:
         #     self.main_time = 0
         t = 0
         while t < self.main_time:
-            stalemate = True
+            # stalemate = True
             print("\n\nTime", t)
             if break_stalemate:
                 print("Breaking stalemate.")
@@ -98,7 +105,7 @@ class GridLV4:
                                          ]
                         while new_path is None:
                             new_goal = random.choice(can_locations)
-                            new_path = l4.LVL4(self.grid_data, self.goals[a], new_goal, self.time_limit, self.current_fuel[a])
+                            new_path = algo.LVL4_UCS(self.grid_data, self.goals[a], new_goal, self.time_limit, self.fuel_limit)
                             if new_path is None:
                                 can_locations.remove(new_goal)
 
@@ -132,7 +139,7 @@ class GridLV4:
                 elif self.paths[a][t + 1] in cans:
                     print("Normal movement to", self.paths[a][t+1])
                     self.current_fuel[a] -= 1
-                    stalemate = False
+#                     stalemate = False
                     continue
 
                 # If the agent can't move to it's designated path, finding a "new" path to it
@@ -150,9 +157,9 @@ class GridLV4:
                         new_flag = False
                         for can in cset:
                             if str(self.grid_data[can[0]][can[1]]) == 'F':
-                                temp_path = l4.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.fuel_limit)
+                                temp_path = algo.LVL4_UCS(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.fuel_limit)
                             else:
-                                temp_path = l4.LVL4(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.current_fuel[a])
+                                temp_path = algo.LVL4_UCS(self.grid_data, can, self.goals[a], self.time_limit - t - 1, self.fuel_limit, self.current_fuel[a])
 
                             if temp_path is None:
                                 continue
@@ -170,7 +177,7 @@ class GridLV4:
                         self.paths[a].insert(t, self.paths[a][t])
                         continue
 
-                    stalemate = False
+#                     stalemate = False
                     # Rewrite its path
                     print("Can move with ", best_path)
                     self.paths[a][t+1:] = l4.get_timed_path(self.grid_data, best_path)
@@ -186,13 +193,10 @@ class GridLV4:
                         self.current_fuel[a] -= 1
 
             t += 1
-            break_stalemate = stalemate or (0 not in set(self.paying_toll) and len(self.paying_toll) > 1)
-
-    def get_poss(self, time):
-        if 0 <= time <= self.main_time + 1:
-            return [self.paths[_][time] for _ in range(self.agents_count)]
-        else:
-            return self.goals
+            break_stalemate = False
+            for prev_t in range(t):
+                if self.get_poss(prev_t) == self.get_poss(t):
+                    break_stalemate = True
 
 
 class Board:
@@ -347,7 +351,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         self.algorithm_paths.append(algo.LVL2_UCS(self.board_data, self.start, self.end, self.time_limit)[0])
         print("\r LV3 is running...", end="")
         self.algorithm_paths.append(algo.LVL3_UCS(self.board_data, self.start, self.end, self.time_limit, self.fuel_limit)[0])
-        # print("\r LV4 is running...", end="")
+        print("\r LV4 is running...", end="")
         # self.lv4_data.algo1()
         # self.algorithm_paths.append(self.lv4_data.paths)
         print("\rFinished!")

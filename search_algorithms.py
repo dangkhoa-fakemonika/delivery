@@ -293,8 +293,9 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
     while True:
         if len(frontier) == 0:
             break
-        
+
         current_node = frontier.pop(0)
+        # print(current_node)
         expansion.append(current_node)
         if time_cost[current_node[0]][current_node[1]] < time_limit and road_cost[current_node[0]][current_node[1]] < fuel_cap:
             explored = generate_neighbor_LVL3_alter(current_node, board_data, reached, end)
@@ -324,7 +325,7 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
             new_path += temp_path
             if len(shortest_path) == 0 or len(shortest_path) > len(new_path):
                 shortest_path = copy.deepcopy(new_path)
-    if (len(shortest_path) != 0):
+    if len(shortest_path) != 0:
         cur_path.clear()
         cur_path += shortest_path
         return True
@@ -378,72 +379,51 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
     
     return None, None
 
-def LVL4(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
-               fuel_cap=float('inf'), current_fuel=float('inf')):
-    path = []
-    if LVL3_Recursive_alter(board_data, start, end, time_limit, fuel_cap, path):
-        return path, None
+def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
+             fuel_cap=float('inf'), current_fuel=float('inf')):
+    rows, cols = len(board_data), len(board_data[0])
+
+    initial_priority = (0, 0, 0)
+
+    # Priority queue: (priority, steps, time, current_position, path)
+    pq = [(initial_priority, 0, 0, current_fuel, start, [])]
+    reached = {start: (0, current_fuel)}
+
+    while pq:
+        _, steps, time, fuel, current, path = heapq.heappop(pq)
+        if (current == (17, 6)):
+            print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
+
+        if time > time_limit or fuel < 0:
+            continue
+
+        if current == end:
+            print(f"Path cost: {steps}, Time: {time}")
+            return path + [current], []
+
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < rows and 0 <= ny < cols:
+                new_pos = (nx, ny)
+                cell = board_data[nx][ny]
+
+                # Skip blocked cells
+                if cell == -1:
+                    continue
+
+                if str(cell)[0] == 'F':
+                    print(f"Cell {cell} is fuel")
+                    new_fuel = fuel_cap
+                    new_time = time + int(str(cell)[1:]) + 1
+                else:
+                    new_fuel = fuel - 1
+                    new_time = time + cell + 1
+
+                if new_pos not in reached or new_time < reached[new_pos][0] or new_fuel > reached[new_pos][1]:
+                    reached[new_pos] = (new_time, new_fuel)
+                    # Priority is now based on steps, with time and fuel as tiebreakers
+                    priority = (steps + 1, new_time, -new_fuel)
+                    heapq.heappush(pq, (priority, steps + 1, new_time, new_fuel, new_pos, path + [current]))
 
     return None, None
-
-
-def LVL4_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit: int,
-                         fuel_cap: int, cur_path: list[int, int]):
-    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
-    frontier: list[tuple[int, int]] = [start]
-    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
-    expansion: list[tuple[int, int]] = []
-    candidate: list[tuple[int, int]] = []
-    shortest_path: list[tuple[int, int]] = []
-
-    if str(board_data[start[0]][start[1]])[0] == 'F':
-        time_cost[start[0]][start[1]] = int((board_data[start[0]][start[1]])[1:])
-    else:
-        time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
-    road_cost[start[0]][start[1]] = 0
-
-    while True:
-        if len(frontier) == 0:
-            break
-
-        current_node = frontier.pop(0)
-        expansion.append(current_node)
-        if time_cost[current_node[0]][current_node[1]] < time_limit and road_cost[current_node[0]][
-            current_node[1]] < fuel_cap:
-            explored = generate_neighbor_LVL3_alter(current_node, board_data, reached, end)
-            for nods in explored:
-                if str(board_data[nods[0]][nods[1]])[0] == 'F':  # is a fuel station
-                    added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
-                else:
-                    added_time_cost = board_data[nods[0]][nods[1]] + 1
-                if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][
-                    current_node[1]] + added_time_cost:
-                    time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + added_time_cost
-                    road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
-                    reached[nods] = current_node
-                    if str(board_data[nods[0]][nods[1]])[0] != 'F':
-                        frontier.append(nods)
-                        if nods == end and time_cost[nods[0]][nods[1]] <= time_limit:
-                            cur_path += generate_path(reached, start, end)
-                            if len(shortest_path) == 0 or len(shortest_path) > len(cur_path):
-                                shortest_path = copy.deepcopy(cur_path)
-                    else:
-                        candidate.append(nods)
-            frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
-    for nods in candidate:
-        temp_path = []
-        if LVL4_Recursive_alter(board_data, nods, end, time_limit - (time_cost[nods[0]][nods[1]] - 1), fuel_cap,
-                                temp_path):
-            new_path = generate_path(reached, start, nods)
-            new_path.pop()
-            new_path += temp_path
-            if len(shortest_path) == 0 or len(shortest_path) > len(new_path):
-                shortest_path = copy.deepcopy(new_path)
-    if (len(shortest_path) != 0):
-        cur_path.clear()
-        cur_path += shortest_path
-        return True
-    else:
-        return False
 

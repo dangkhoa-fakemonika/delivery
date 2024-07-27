@@ -198,7 +198,7 @@ while running:
                 break
             if event.key == pygame.K_a and path_steps >= 1 and get_path is not None:
                 path_steps -= 1
-            if event.key == pygame.K_d and path_steps <= cost and get_path is not None:
+            if event.key == pygame.K_d and path_steps < cost and get_path is not None:
                 path_steps += 1
             if event.key == pygame.K_SPACE and get_path is not None:  # Space to autoplay
                 auto_move = not auto_move
