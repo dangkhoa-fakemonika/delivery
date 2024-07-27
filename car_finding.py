@@ -232,6 +232,7 @@ while running:
     if frame == fps:
         frame = 0
 
+    # print(path_steps)
     if auto_move:
         path_steps += 1
         if path_steps > cost:

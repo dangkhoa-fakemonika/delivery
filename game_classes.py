@@ -1,8 +1,9 @@
 from typing import Literal
 import search_algorithms as algo
 import display_setup as ds
-from lv4_cinema import lv4 as l4
+import lv4 as l4
 import random
+
 
 class GridLV4:
     def __init__(self):
@@ -135,9 +136,7 @@ class GridLV4:
                     continue
 
                 # If the agent can't move to it's designated path, finding a "new" path to it
-
                 else:
-
                     self.current_fuel[a] -= 1
                     best_path = []
 
@@ -190,10 +189,10 @@ class GridLV4:
             break_stalemate = stalemate or (0 not in set(self.paying_toll) and len(self.paying_toll) > 1)
 
     def get_poss(self, time):
-        if 0 <= time < self.main_time:
+        if 0 <= time <= self.main_time + 1:
             return [self.paths[_][time] for _ in range(self.agents_count)]
         else:
-            return self.starts
+            return self.goals
 
 
 class Board:
@@ -235,6 +234,7 @@ Screen offset: ({self.offset_x, self.offset_y})
             else:
                 ds.draw_board_data(screen, level, self.board_data, self.start, self.end, self.size, self.box_size, self.offset_x, self.offset_y)
         else:
+            print(self.lv4_data.get_poss(step))
             ds.draw_lv4_step(screen, self.lv4_data.agents_count, self.board_data, path, step, self.fuel_limit, self.box_size, self.offset_x, self.offset_y)
             ds.draw_lv4_board_data(screen, self.lv4_data.agents_count, self.board_data, self.lv4_data.get_poss(step), self.lv4_data.goals, self.size, self.box_size, self.offset_x, self.offset_y)
 

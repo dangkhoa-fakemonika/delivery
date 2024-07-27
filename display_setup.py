@@ -7,10 +7,11 @@ def get_box_config(res: tuple[int, int], grid_size: tuple[int, int]):
     height = res[1] - 100
 
     box_width = min(width // grid_size[0], height // grid_size[1])
-    offset_x = (res[0] - box_width * grid_size[0]) // 2 - 150
-    offset_y = (res[1] - box_width * grid_size[1]) // 2
+    offset_x = (res[0] - box_width * grid_size[1]) // 2 - 100
+    offset_y = (res[1] - box_width * grid_size[0]) // 2
 
-    print(offset_x, offset_y)
+    # offset_x = 10
+    # offset_y = 10
     return box_width, offset_x, offset_y
 
 
@@ -287,15 +288,15 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
                 fuel_cost -= 1
     info = []
     current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
-                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5))
+                                                (scr_offset_x + box_size * len(board_data[1]) + 40, 250))
     info.append((current_cost, current_cost_rect))
     if level in ('lvl2', 'lvl3'):
         time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", 20,
-                                          (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 6))
+                                          (scr_offset_x + box_size * len(board_data[1]) + 40, 280))
         info.append((time_cost, time_cost_rect))
     if level == 'lvl3':
         current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", 20,
-                                                    (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 7))
+                                                    (scr_offset_x + box_size * len(board_data[1]) + 40, 310))
         info.append((current_fuel, current_fuel_rect))
 
     scr.blits(info)
@@ -319,40 +320,40 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
 
     display_font = pygame.font.SysFont("comicsansms", box_size // 3)
     pygame.draw.rect(scr, (255, 255, 255),
-                     (scr_offset_x * 2 + box_size * grid_size[0], scr_offset_y, 250, box_size * grid_size[1]),
+                     (scr_offset_x + box_size * grid_size[1] + 20, 50, 250, 600),
                      width=2)
 
     start_value, start_value_rect = draw_text(f"Start: {start[0], start[1]}", "comicsansms",  20,
-                                              (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10))
+                                              (scr_offset_x + box_size * grid_size[1] + 40, 80))
     info_list.append((start_value, start_value_rect))
 
     end_value, end_value_rect = draw_text(f"End: {end[0], end[1]}", "comicsansms",  20,
-                                          (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size))
+                                          (scr_offset_x + box_size * grid_size[1] + 40, 110))
     info_list.append((end_value, end_value_rect))
 
     if level in ('lvl2', 'lvl3', 'lvl4'):
         time_value, time_value_rect = draw_text(f"Time limit: {time_limit}", "comicsansms",  20,
-                                                (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 2))
+                                                (scr_offset_x + box_size * grid_size[1] + 40, 140))
 
         info_list.append((time_value, time_value_rect))
     if level in ('lvl3', 'lvl4'):
         fuel_value, fuel_value_rect = draw_text(f"Fuel limit: {fuel_limit}", "comicsansms",  20,
-                                                (scr_offset_x * 2 + box_size * grid_size[0] + 10, scr_offset_y + 10 + box_size * 3))
+                                                (scr_offset_x + box_size * grid_size[1] + 40, 170))
         info_list.append((fuel_value, fuel_value_rect))
 
     alias_name, alias_name_rect = draw_text(level.upper(), "comicsansms",  20,
-                                            (scr_offset_x * 2 + box_size * (grid_size[0] + 1.5) , scr_offset_y + 10 + box_size * 4))
+                                            (scr_offset_x + box_size * grid_size[1] + 100, 210))
     info_list.append((alias_name, alias_name_rect))
 
     pygame.draw.polygon(scr, (255, 255, 255), [
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 10 + box_size * 4),
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 10, scr_offset_y + 20 + box_size * 4),
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 0.5) + 20, scr_offset_y + 30 + box_size * 4),
+        (scr_offset_x + box_size * grid_size[1] + 20 + 75, 205 + 10),
+        (scr_offset_x + box_size * grid_size[1] + 10 + 75, 205 + 20),
+        (scr_offset_x + box_size * grid_size[1] + 20 + 75, 205 + 30),
     ])
     pygame.draw.polygon(scr, (255, 255, 255), [
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 10 + box_size * 4),
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 20, scr_offset_y + 20 + box_size * 4),
-        (scr_offset_x * 2 + box_size * (grid_size[0] + 2.5) + 10, scr_offset_y + 30 + box_size * 4),
+        (scr_offset_x + box_size * grid_size[1] + 10 + 145, 205 + 10),
+        (scr_offset_x + box_size * grid_size[1] + 20 + 145, 205 + 20),
+        (scr_offset_x + box_size * grid_size[1] + 10 + 145, 205 + 30),
     ])
 
     scr.blits(info_list)
@@ -424,3 +425,6 @@ def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, en
     for i in range(agents_count):
         pygame.draw.circle(scr, agent_color[i],
                          (offset_x + (start[i][1] + .5) * box_width, offset_y + (start[i][0] + .5) * box_width), box_width / 2)
+        pygame.draw.circle(scr, (255, 255, 255),
+                           (offset_x + (start[i][1] + .5) * box_width, offset_y + (start[i][0] + .5) * box_width),
+                           box_width / 2, 1)

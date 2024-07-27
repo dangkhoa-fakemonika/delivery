@@ -80,6 +80,8 @@ def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]],
     if path is None:
         return 0
     if level == 'lvl4':
+        # print(path[0])
+        # print(len(path[0]))
         return len(path[0])
 
     total_time = len(path) - 1

@@ -60,8 +60,8 @@ def generate_candidates_LVL4(block: tuple[int, int], board_data, goal, breaking)
                 str(board_data[x][y]) >= '0'
         ):
             explored.append((x, y))
-    explored.sort(key=lambda x: abs(goal[0] - x[0]) + abs(
-        goal[1] - x[1]))  #prioritize tile closer to goal based on manhattan distance
+    explored.sort(key=lambda a: abs(goal[0] - a[0]) + abs(
+        goal[1] - a[1]))  #prioritize tile closer to goal based on manhattan distance
     return explored
 
 
