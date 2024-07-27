@@ -230,24 +230,19 @@ def A_STAR(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, 
         frontier.sort(key=lambda x: road_cost[x[0]][x[1]] + abs(end[0] - x[0]) + abs(end[1] - x[1])) # F = G + H  
 
 
-def LVL2_UCS(board_data : list[list[int]], start : tuple[int, int], end : tuple[int, int], time_limit=float('inf')):
+def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf')):
     rows, cols = len(board_data), len(board_data[0])
     
     # Priority queue: (path_cost, time, current_position, path)
     pq = [(0, 0, start, [])]
-    reached = set()
+    reached = {start: 0}
 
     while pq:
-        path_cost, time, current, path = heapq.heappop(pq)
+        steps, time, current, path = heapq.heappop(pq)
         
-        if current == end and time <= time_limit:
-            print(f"Path cost: {path_cost}, Time: {time}")
+        if current == end:
+            print(f"Path cost: {steps}, Time: {time}")
             return path + [current], []
-        
-        if (current, path_cost) in reached or time > time_limit:
-            continue
-        
-        reached.add((current, path_cost))
         
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = current[0] + dx, current[1] + dy
@@ -259,110 +254,18 @@ def LVL2_UCS(board_data : list[list[int]], start : tuple[int, int], end : tuple[
                 if cell == -1:
                     continue
                 
-                new_path_cost = path_cost + 1
-                
                 # Ignore gas station
-                if str(cell)[0] == 'F':
+                if isinstance(cell, str) and cell.startswith('F'):
                     new_time = time + 1
                 else:
                     new_time = time + cell + 1
                 
                 if new_time <= time_limit:
-                    new_path = path + [current]
-                    heapq.heappush(pq, (new_path_cost, new_time, new_pos, new_path))
+                    if new_pos not in reached or new_time < reached[new_pos]:
+                        reached[new_pos] = new_time
+                        heapq.heappush(pq, (steps + 1, new_time, new_pos, path + [current]))
     
     return None, None
-
-def LVL3(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], limit=float('inf'), fuel_cap = float('inf')):
-    for step in range (0, len(board_data) * len(board_data[0])):
-        print('maxstep = ', step)
-        reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
-        path = [start]
-        if LVL3_Backtracking(board_data, start, end, step, 0, limit, fuel_cap, fuel_cap, path, reached):
-            print(step, 'step')
-            return path, None
-
-    return None, None
-
-
-def LVL3_Backtracking(board_data: list[list[int]], current: tuple[int, int], end: tuple[int, int], remaining_step: int, cur_time: int, time_limit: int, cur_fuel: int, fuel_cap: int, cur_path: list[int, int], reached: dict[tuple[int, int]: tuple[int, int]]):
-    #Base case
-    if current == end:
-        if cur_time <= time_limit:
-            return True
-        else:
-            return False
-    #If these conditions are violated, further exploration becomes meaningless because it's already an invalid path, so we return early
-    if remaining_step <= 0 or cur_fuel <= 0 or cur_time >= time_limit: 
-        return False
-    if str(board_data[current[0]][current[1]])[0] == 'F': #is a fuel station
-        added_time_cost = int((board_data[current[0]][current[1]])[1:]) + 1
-        cur_fuel = fuel_cap
-    else:
-        added_time_cost = board_data[current[0]][current[1]] + 1
-    explored = generate_neighbor_LVL3(current, board_data, reached, end)
-    for nods in explored:
-        if str(board_data[nods[0]][nods[1]])[0] == 'F': #if it's a fuel station, we reset the reached map by create a new one in order to allow past tiles to be traversed
-            new_reached: dict[tuple[int, int]: tuple[int, int]] = {nods: -1}
-            cur_path.append(nods)
-            if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, fuel_cap, fuel_cap, cur_path, new_reached):
-                return True
-            new_reached.pop(nods)
-            cur_path.pop()     
-        else: #default recursive case, call the recursion function on the neighbor tile with updated status(remaining step, current time, current fule)
-            reached[nods] = current
-            cur_path.append(nods)
-            if LVL3_Backtracking(board_data, nods, end, remaining_step - 1, cur_time + added_time_cost, time_limit, cur_fuel - 1, fuel_cap, cur_path, reached):
-                return True
-            reached.pop(nods)
-            cur_path.pop()
-    return False
-
-# Still in progress
-def LVL3_UCS(board_data, start, end, time_limit=float('inf'), fuel_cap=float('inf')):
-    rows, cols = len(board_data), len(board_data[0])
-    
-    # Priority queue: (priority, path cost, time, fuel, current_position, path)
-    pq = [(0, 0, 0, fuel_cap, start, [])]
-    visited = set()
-
-    while pq:
-        _, path_cost, time, fuel, current, path = heapq.heappop(pq)
-        
-        if current == end and time <= time_limit:
-            return path + [current], []
-        
-        if (current, fuel) in visited or time > time_limit or fuel < 0:
-            continue
-        
-        visited.add((current, fuel))
-        
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = current[0] + dx, current[1] + dy
-            if 0 <= nx < rows and 0 <= ny < cols:
-                new_pos = (nx, ny)
-                cell = board_data[nx][ny]
-                
-                # Skip blocked cells
-                if cell == -1:
-                    continue
-                
-                if str(cell)[0] == 'F':
-                    new_fuel = fuel_cap
-                    new_time = time + int(str(cell)[1:]) + 1
-                else:
-                    new_fuel = fuel - 1
-                    new_time = time + cell
-                    new_path_cost = path_cost + 1
-                
-                if new_time <= time_limit and new_fuel >= 0:
-                    new_path = path + [current]
-                    # Priority considers path cost, and remaining fuel
-                    priority = path_cost - (new_fuel / fuel_cap)
-                    heapq.heappush(pq, (priority, new_path_cost, new_time, new_fuel, new_pos, new_path))
-    
-    return None, None  # No path found
-
 
 def LVL3_alter(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'), fuel_cap = float('inf')):
     path = []
@@ -428,6 +331,52 @@ def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], en
     else:
         return False
 
+def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'), fuel_cap = float('inf')):
+    rows, cols = len(board_data), len(board_data[0])
+    
+    initial_priority = (0, 0, 0)
+    
+    # Priority queue: (priority, steps, time, current_position, path)
+    pq = [(initial_priority, 0, 0, fuel_cap, start, [])]
+    reached = {start: (0, fuel_cap)}
+
+    while pq:
+        _, steps, time, fuel, current, path = heapq.heappop(pq)
+        if (current == (17, 6)):
+            print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
+        
+        if time > time_limit or fuel < 0:
+            continue
+        
+        if current == end:
+            print(f"Path cost: {steps}, Time: {time}")
+            return path + [current], []
+        
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < rows and 0 <= ny < cols:
+                new_pos = (nx, ny)
+                cell = board_data[nx][ny]
+                
+                # Skip blocked cells
+                if cell == -1:
+                    continue
+                
+                if str(cell)[0] == 'F':
+                    print(f"Cell {cell} is fuel")
+                    new_fuel = fuel_cap
+                    new_time = time + int(str(cell)[1:]) + 1
+                else:
+                    new_fuel = fuel - 1
+                    new_time = time + cell + 1
+                
+                if new_pos not in reached or new_time < reached[new_pos][0] or new_fuel > reached[new_pos][1]:
+                    reached[new_pos] = (new_time, new_fuel)
+                    # Priority is now based on steps, with time and fuel as tiebreakers
+                    priority = (steps + 1, new_time, -new_fuel)
+                    heapq.heappush(pq, (priority, steps + 1, new_time, new_fuel, new_pos, path + [current]))
+    
+    return None, None
 
 def LVL4(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
                fuel_cap=float('inf'), current_fuel=float('inf')):

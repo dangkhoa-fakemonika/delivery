@@ -344,12 +344,12 @@ Screen offset: ({self.offset_x, self.offset_y})
         print("\r A* is running...", end="")
         self.algorithm_paths.append(algo.A_STAR(self.board_data, self.start, self.end)[0])
         print("\r LV2 is running...", end="")
-        self.algorithm_paths.append(algo.LVL3_alter(self.board_data, self.start, self.end, self.time_limit)[0])
+        self.algorithm_paths.append(algo.LVL2_UCS(self.board_data, self.start, self.end, self.time_limit)[0])
         print("\r LV3 is running...", end="")
-        self.algorithm_paths.append(algo.LVL3_alter(self.board_data, self.start, self.end, self.time_limit, self.fuel_limit)[0])
-        print("\r LV4 is running...", end="")
-        self.lv4_data.algo1()
-        self.algorithm_paths.append(self.lv4_data.paths)
+        self.algorithm_paths.append(algo.LVL3_UCS(self.board_data, self.start, self.end, self.time_limit, self.fuel_limit)[0])
+        # print("\r LV4 is running...", end="")
+        # self.lv4_data.algo1()
+        # self.algorithm_paths.append(self.lv4_data.paths)
         print("\rFinished!")
 
     def configure_algorithm(self, algorithm: str | Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs'):
@@ -367,5 +367,5 @@ Screen offset: ({self.offset_x, self.offset_y})
             return self.algorithm_paths[5]
         if algorithm == 'lvl3':
             return self.algorithm_paths[6]
-        if algorithm == 'lvl4':
-            return self.algorithm_paths[7]
+        # if algorithm == 'lvl4':
+        #     return self.algorithm_paths[7]

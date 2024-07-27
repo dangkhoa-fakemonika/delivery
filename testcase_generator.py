@@ -69,28 +69,10 @@ class MatrixGenerator:
     def run(self):
         self.root.mainloop()
         
-board = [
-    [0, 0, -1, 0, -1, -1, 0, 0, 0, 0],
-    [0, "S", -1, 0, -1, 0, 0, -1, 0, -1],
-    [-1, -1, -1, -1, -1, 0, 0, -1, 0, -1],
-    [0, 0, "F1", "F2", -1, 0, 0, -1, 0, 0],
-    [0, 0, -1, -1, -1, 0, 0, -1, -1, 0],
-    [1, 0, -1, 0, 0, 0, 0, 0, -1, 0],
-    [0, 0, 0, 0, -1, 5, -1, 0, -1, 0],
-    [0, 0, 0, 0, -1, 0, 0, 0, 0, 0],
-    [0, -1, -1, -1, -1, 0, 0, 0, 0, 0],
-    [0, 0, 5, 0, 0, 0, -1, -1, -1, "G"]
-]
        
 def main():
-    # generator = MatrixGenerator(20, 20)
-    # generator.load_matrix("input/input_level1_maze.txt")
-    # generator.run()
-    print(len(board), len(board[0]), "99 18")
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            print(board[i][j], end=" ")
-        print()
-    
+    generator = MatrixGenerator(20, 19)
+    generator.run()
+    #21
 if __name__ == '__main__':
     main()
