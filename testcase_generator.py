@@ -71,7 +71,7 @@ class MatrixGenerator:
         
        
 def main():
-    generator = MatrixGenerator(20, 19)
+    generator = MatrixGenerator(20, 20)
     generator.run()
     #21
 if __name__ == '__main__':
