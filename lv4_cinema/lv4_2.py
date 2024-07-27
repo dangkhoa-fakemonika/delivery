@@ -72,10 +72,10 @@ class GridLV4:
 
                 print("Current location:", self.paths[a][t])
 
-                if self.paths[a][t] == (-1, -1):
-                    print("This agent is paying his debt of his afterlife.")
-                    self.paying_toll[a] = float('inf')
-                    self.paths[a].append((-1, -1))
+                # if self.paths[a][t] == (-1, -1):
+                #     print("This agent is paying his debt of his afterlife.")
+                #     self.paying_toll[a] = float('inf')
+                #     self.paths[a].append((-1, -1))
 
                 if self.paying_toll[a] > 0:  # Is waiting
                     print("Is paying road toll")
@@ -89,16 +89,18 @@ class GridLV4:
                     if a != 0:
                         print("Goal reached, generating a new one.")
                         new_goal = self.goals[a]
-                        while new_goal in self.goals or str(self.grid_data[new_goal[0]][new_goal[1]]) != '-1' or new_goal in [self.paths[_][t] for _ in range(self.agents_count)]:
-                            new_goal = (
-                                random.randint(0, len(self.grid_data) - 1),
-                                random.randint(0, len(self.grid_data[0]) - 1)
-                            )
-                        new_path = l4.LVL3(self.grid_data, self.goals[a], new_goal, self.time_limit, self.fuel_limit)
-                        if new_path is None:
-                            self.paths[a].append((-1, -1))
-                        else:
-                            self.paths[a].extend(l4.get_timed_path(self.grid_data, new_path))
+                        new_path = None
+                        can_locations = [(x, y) for x in range(len(self.grid_data)) for y in range(len(self.grid_data[0])) if
+                                         (new_goal in self.goals or str(self.grid_data[x][y]) != '-1'
+                                          or new_goal in [self.paths[_][t] for _ in range(self.agents_count)])
+                                         ]
+                        while new_path is None:
+                            new_goal = random.choice(can_locations)
+                            new_path = l4.LVL3(self.grid_data, self.goals[a], new_goal, self.time_limit, self.fuel_limit)
+                            if new_path is None:
+                                can_locations.remove(new_goal)
+
+                        self.paths[a].extend(l4.get_timed_path(self.grid_data, new_path))
                         print("Goal is generated at:", new_goal)
                         self.goals[a] = new_goal
                     if a == 0:
@@ -188,18 +190,37 @@ class GridLV4:
 
 
 test = GridLV4()
+#
+# b = [
+#     [-1, -1, -1, -1, -1, -1, -1],
+#     [-1, -1, -1, -1, -1, -1, -1],
+#     [-0,  0,  0,  0,  0,  0,  0],
+#     [-1, -1, -1,  0, -1, -1, -1],
+#     [-1, -1, -1,  0, -1, -1, -1]
+# ]
+#
+# b = [
+#     [0, -1, -1, -1, -1, -1, 0],
+#     [0, 0, 0, 0, 0, 0, 0],
+#     [0, -1, -1, -1, -1, -1, 0]
+# ]
 
 b = [
-    [-1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1],
-    [-0,  0,  0,  0,  0,  0,  0],
-    [-1, -1, -1,  0, -1, -1, -1],
-    [-1, -1, -1,  0, -1, -1, -1]
+    [-1, 0, -1, 0, -1, 0, -1, 0, -1, 0],
+    [-1, 0, -1, 0, -1, 0, -1, 0, -1, 0],
+    [-1, 0, -1, 0, -1, 0, -1, 0, -1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, -1],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, -1],
+    [0, -1, 0, -1, 0, -1, 0, -1, 0, -1],
+
 ]
 
-s = [(2, 1), (2, 5)]
-g = [(2, 6), (4, 3)]
+# s = [(1, 2), (1, 4)]
+# g = [(1, 5), (1, 1)]
 
+s = [(1, 1), (1, 3), (1, 5), (1, 7), (1, 9), (5, 8), (5, 6), (5, 4), (5, 2), (5, 0)]
+g = [(6, 0), (0, 1), (0, 3), (0, 5), (0, 7), (0, 9), (6, 8), (6, 6), (6, 4), (6, 2)]
 
 test.get_initial_data(data=b, starts=s, goals=g)
 test.algo1()
