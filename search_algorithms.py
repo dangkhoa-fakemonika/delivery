@@ -63,16 +63,13 @@ def generate_neighbor_LVL3_alter(block: tuple[int, int], board_data, reached: di
             explored.append((x, y))
     return explored
 
+
 def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: tuple[int, int], end: tuple[int, int]):
-    # path_move = []
     path_block = []
     while True:
-        # path_move.insert(0, configure_path(reached_table[end], end))
         path_block.insert(0, end)
         end = reached_table[end]
         if end == -1:
-            # path_move.insert(0, configure_path(reached_table[end], end))
-            # path_block.insert(0, end)
             return path_block  # path_move
 
 
@@ -80,16 +77,14 @@ def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]],
     if path is None:
         return 0
     if level == 'lvl4':
-        # print(path[0])
-        # print(len(path[0]))
         return len(path[0])
 
     total_time = len(path) - 1
 
     for step in path:
-        if level in ('lvl2', 'lvl3') and str(board_data[step[0]][step[1]])[0] != 'F':
+        if level in ('lvl2', 'lvl3') and str(board_data[step[0]][step[1]])[0] != 'F': # Time toll
             total_time += board_data[step[0]][step[1]]
-        elif level == 'lvl3' and str(board_data[step[0]][step[1]])[0] == 'F':
+        elif level == 'lvl3' and str(board_data[step[0]][step[1]])[0] == 'F': # Fuel toll
             total_time += int(str(board_data[step[0]][step[1]]).strip('F'))
 
     return total_time
@@ -391,15 +386,15 @@ def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
 
     while pq:
         _, steps, time, fuel, current, path = heapq.heappop(pq)
-        if (current == (17, 6)):
-            print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
+        # if (current == (17, 6)):
+        #     print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
 
         if time > time_limit or fuel < 0:
             continue
 
         if current == end:
-            print(f"Path cost: {steps}, Time: {time}")
-            return path + [current], []
+            # print(f"Path cost: {steps}, Time: {time}")
+            return path + [current]
 
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = current[0] + dx, current[1] + dy
@@ -412,7 +407,7 @@ def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     continue
 
                 if str(cell)[0] == 'F':
-                    print(f"Cell {cell} is fuel")
+                    # print(f"Cell {cell} is fuel")
                     new_fuel = fuel_cap
                     new_time = time + int(str(cell)[1:]) + 1
                 else:
@@ -425,5 +420,5 @@ def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     priority = (steps + 1, new_time, -new_fuel)
                     heapq.heappush(pq, (priority, steps + 1, new_time, new_fuel, new_pos, path + [current]))
 
-    return None, None
+    return None
 

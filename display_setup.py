@@ -261,7 +261,7 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
     fuel_cost = fuel
     stopped_time = 0
 
-    while total_time < time - 1:
+    while total_time < time:
         pygame.draw.rect(scr, (0, 128, 128),
                          (scr_offset_x + path_movement[total_cost][1] * box_size,
                           scr_offset_y + path_movement[total_cost][0] * box_size,
@@ -279,15 +279,15 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
                 total_cost += 1
 
         elif level == 'lvl3':
-            if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
-                stopped_time = 0
-                total_cost += 1
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
-            else:
+            if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
                 fuel_cost -= 1
+                stopped_time = 0
+                total_cost += 1
+
     info = []
-    current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
+    current_cost, current_cost_rect = draw_text(f"Path cost: {path_movement[total_cost]}", "comicsansms",  20,
                                                 (scr_offset_x + box_size * len(board_data[1]) + 40, 250))
     info.append((current_cost, current_cost_rect))
     if level in ('lvl2', 'lvl3'):
