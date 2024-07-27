@@ -335,7 +335,7 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
     # Priority queue: (priority, steps, time, fuel, current_position, path)
     pq = [(initial_priority, 0, 0, fuel_cap, start, [])]
     reached = {start: (0, fuel_cap)}
-
+    
     while pq:
         _, steps, time, fuel, current, path = heapq.heappop(pq)
         
@@ -373,7 +373,6 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
 def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
              fuel_cap=float('inf'), current_fuel=float('inf')):
     rows, cols = len(board_data), len(board_data[0])
-
     initial_priority = (0, 0, 0)
 
     # Priority queue: (priority, steps, time, current_position, path)
