@@ -1,4 +1,5 @@
 import heapq
+import copy
 
 def configure_path(move_1: tuple[int, int], move_2: tuple[int, int]):
     if move_1 == -1:
@@ -342,3 +343,67 @@ def LVL3_UCS(board_data, start, end, time_limit=float('inf'), fuel_cap=float('in
                     heapq.heappush(pq, (priority, new_path_cost, new_time, new_fuel, new_pos, new_path))
     
     return None, None  # No path found
+
+def LVL3_alter(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'), fuel_cap = float('inf')):
+    path = []
+    if LVL3_Recursive_alter(board_data, start, end, time_limit, fuel_cap, path):
+        return path, None
+
+    return None, None
+
+
+def LVL3_Recursive_alter(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit: int, fuel_cap: int, cur_path: list[int, int]):
+    reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
+    frontier: list[tuple[int, int]] = [start]
+    time_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    road_cost = [[float('inf') for _ in range(len(board_data))] for __ in range(len(board_data))]
+    expansion: list[tuple[int, int]] = []
+    candidate: list[tuple[int, int]] = []
+    shortest_path: list[tuple[int, int]] = []
+
+    if str(board_data[start[0]][start[1]])[0] == 'F':
+        time_cost[start[0]][start[1]] = int((board_data[start[0]][start[1]])[1:])
+    else:
+        time_cost[start[0]][start[1]] = board_data[start[0]][start[1]]
+    road_cost[start[0]][start[1]] = 0
+    
+    while True:
+        if len(frontier) == 0:
+            break
+        
+        current_node = frontier.pop(0)
+        expansion.append(current_node)
+        if time_cost[current_node[0]][current_node[1]] < time_limit and road_cost[current_node[0]][current_node[1]] < fuel_cap:
+            explored = generate_neighbor_LVL3(current_node, board_data, reached, end)
+            for nods in explored:
+                if str(board_data[nods[0]][nods[1]])[0] == 'F': #is a fuel station
+                    added_time_cost = int((board_data[nods[0]][nods[1]])[1:]) + 1
+                else:
+                    added_time_cost = board_data[nods[0]][nods[1]] + 1
+                if nods not in reached or time_cost[nods[0]][nods[1]] > time_cost[current_node[0]][current_node[1]] + added_time_cost:
+                    time_cost[nods[0]][nods[1]] = time_cost[current_node[0]][current_node[1]] + added_time_cost
+                    road_cost[nods[0]][nods[1]] = road_cost[current_node[0]][current_node[1]] + 1
+                    reached[nods] = current_node
+                    if str(board_data[nods[0]][nods[1]])[0] != 'F': 
+                        frontier.append(nods)
+                        if nods == end and time_cost[nods[0]][nods[1]] <= time_limit:
+                            cur_path += generate_path(reached, start, end)
+                            if len(shortest_path) == 0 or len(shortest_path) > len(cur_path):
+                                shortest_path = copy.deepcopy(cur_path)
+                    else:
+                        candidate.append(nods)
+            frontier.sort(key=lambda x: road_cost[x[0]][x[1]])
+    for nods in candidate:
+        temp_path = []
+        if LVL3_Recursive_alter(board_data, nods, end, time_limit - (time_cost[nods[0]][nods[1]] - 1), fuel_cap, temp_path):
+            new_path = generate_path(reached, start, nods) 
+            new_path.pop()
+            new_path += temp_path
+            if len(shortest_path) == 0 or len(shortest_path) > len(new_path):
+                shortest_path = new_path
+    if (len(shortest_path) != 0):
+        cur_path.clear()
+        cur_path += shortest_path
+        return True
+    else:
+        return False
