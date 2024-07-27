@@ -2,6 +2,7 @@ from typing import Literal
 import search_algorithms as algo
 import display_setup as ds
 from lv4_cinema import lv4 as l4
+import random
 
 class GridLV4:
     def __init__(self):
@@ -343,10 +344,9 @@ Screen offset: ({self.offset_x, self.offset_y})
         print("\r A* is running...", end="")
         self.algorithm_paths.append(algo.A_STAR(self.board_data, self.start, self.end)[0])
         print("\r LV2 is running...", end="")
-        self.algorithm_paths.append(algo.LVL2_UCS(self.board_data, self.start, self.end, self.time_limit)[0])
+        self.algorithm_paths.append(algo.LVL3_alter(self.board_data, self.start, self.end, self.time_limit)[0])
         print("\r LV3 is running...", end="")
         self.algorithm_paths.append(algo.LVL3_alter(self.board_data, self.start, self.end, self.time_limit, self.fuel_limit)[0])
-        
         print("\r LV4 is running...", end="")
         self.lv4_data.algo1()
         self.algorithm_paths.append(self.lv4_data.paths)

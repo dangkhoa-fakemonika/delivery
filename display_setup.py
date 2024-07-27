@@ -18,7 +18,7 @@ def draw_grid(scr: pygame.Surface, grid_size, box_width, offset_x, offset_y):
     for it in range(grid_size[0]):
         for ii in range(grid_size[1]):
             pygame.draw.rect(scr, (255, 255, 255),
-                             (offset_x + it * box_width, offset_y + ii * box_width, box_width, box_width), width=1)
+                             (offset_x + ii * box_width, offset_y + it * box_width, box_width, box_width), width=1)
 
 
 def draw_text(text, font_name, size, coordinate, color=(255, 255, 255)) -> tuple:
@@ -419,8 +419,8 @@ def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, en
     )
 
     for i in range(agents_count):
-        pygame.draw.circle(scr, agent_color[i],
-                         (offset_x + (start[i][1] + .5) * box_width, offset_y + (start[i][0] + .5) * box_width), box_width / 2)
-
         pygame.draw.rect(scr, agent_color[i],
                          (offset_x + end[i][1] * box_width, offset_y + end[i][0] * box_width, box_width, box_width))
+    for i in range(agents_count):
+        pygame.draw.circle(scr, agent_color[i],
+                         (offset_x + (start[i][1] + .5) * box_width, offset_y + (start[i][0] + .5) * box_width), box_width / 2)
