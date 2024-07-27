@@ -148,7 +148,7 @@ board = [
 # e_pos = (9, 9)
 
 game_board = Board()
-game_board.import_board_data("input/input_all_levels_sample.txt")
+game_board.import_board_data("input/input_level4.txt")
 
 #game_board.board_data = board
 
@@ -165,7 +165,7 @@ running = True
 
 levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3', 'lvl4')
 
-level = 'bfs'
+level = 'lvl4'
 
 pygame.init()
 screen = pygame.display.set_mode(screen_res)
@@ -173,6 +173,7 @@ pygame.display.set_caption("lmao")
 game_board.run_algorithms()
 
 get_path = game_board.configure_algorithm(level)
+
 # get_path, get_expansion = game_board.configure_algorithm('lvl2')
 # get_path, get_expansion = game_board.configure_algorithm()
 cost = algo.generate_time_cost(game_board.board_data, get_path, level)
@@ -182,6 +183,8 @@ algorithm = levels.index(level)
 # game_board.board_layout_init()  # Uncomment to load textures
 
 # print(game_board)
+
+print(get_path)
 
 while running:
     screen.fill((0, 0, 0))
@@ -198,7 +201,7 @@ while running:
                 break
             if event.key == pygame.K_a and path_steps >= 1 and get_path is not None:
                 path_steps -= 1
-            if event.key == pygame.K_d and path_steps <= cost and get_path is not None:
+            if event.key == pygame.K_d and path_steps < cost and get_path is not None:
                 path_steps += 1
             if event.key == pygame.K_SPACE and get_path is not None:  # Space to autoplay
                 auto_move = not auto_move
@@ -232,7 +235,7 @@ while running:
     if frame == fps:
         frame = 0
 
-    # print(path_steps)
+    print(path_steps)
     if auto_move:
         path_steps += 1
         if path_steps > cost:
