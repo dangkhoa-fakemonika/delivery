@@ -1,0 +1,2 @@
+This program is required to have Pygame library installed.
+For more information, follow this link: https://www.pygame.org/wiki/GettingStarted

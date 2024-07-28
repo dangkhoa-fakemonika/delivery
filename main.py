@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # file_input = input('Enter the input file name (ex: input.txt): ')
     # custom = input('Use custom input? [Y/N] ')
 
-    file_input = "input/input_level4_uno.txt"
+    file_input = "input/input_level4_basic.txt"
     custom = 'a'
 
     game_board = Board()
@@ -25,8 +25,15 @@ if __name__ == '__main__':
     running = True
 
     levels = ('bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3', 'lvl4')
-    level = 'bfs'
-
+    if 'level2' in file_input:
+        level = 'lvl2'
+    elif 'level3' in file_input:
+        level = 'lvl3'
+    elif 'level4' in file_input:
+        level = 'lvl4'
+    else:
+        level = 'bfs'
+        
     pygame.init()
     screen = pygame.display.set_mode(screen_res)
     pygame.display.set_caption("Delivery System")

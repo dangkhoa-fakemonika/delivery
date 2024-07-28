@@ -48,7 +48,6 @@ class GridLV4:
             return [self.paths[_][-1] for _ in range(self.agents_count)]
 
     def algo1(self):
-
         # From the start, initiate all new part of the goal
         # A goal will move through its next step if it is not blocked
         break_stalemate = False
@@ -61,11 +60,6 @@ class GridLV4:
 
         t = 0
         while t < self.main_time:
-            # if break_stalemate:
-            #     print("Breaking stalemate.")
-            # for p in self.paths:
-            #     print(p)
-
             for a in range(self.agents_count):
                 if self.paths[a] is None:
                     continue
@@ -80,24 +74,6 @@ class GridLV4:
                 if self.paths[a][t] == self.goals[a]:
                     if a != 0:
                         self.paths[a].insert(t, self.paths[a][t])
-#                         # print("Goal reached, generating a new one.")
-                        # new_goal = self.goals[a]
-                        # new_path = None
-                        # can_locations = [(x, y) for x in range(len(self.grid_data)) for y in
-                        #                  range(len(self.grid_data[0])) if
-                        #                  (new_goal in self.goals or str(self.grid_data[x][y]) != '-1'
-                        #                   or new_goal in [self.paths[_][t] for _ in range(self.agents_count)])
-                        #                  ]
-                        # while new_path is None:
-                        #     new_goal = random.choice(can_locations)
-                        #     new_path = algo.LVL4_UCS(self.grid_data, self.goals[a], new_goal, self.time_limit,
-                        #                              self.fuel_limit)
-                        #     if new_path is None:
-                        #         can_locations.remove(new_goal)
-                        #
-                        # self.paths[a].extend(algo.get_timed_path(self.grid_data, new_path))
-#                         # print("Goal is generated at:", new_goal)
-                        # self.goals[a] = new_goal
                     if a == 0:
                         self.main_time = len(self.paths[0])
                         return self.paths
