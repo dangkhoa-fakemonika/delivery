@@ -45,7 +45,7 @@ class GridLV4:
         try:
             return [self.paths[_][time] for _ in range(self.agents_count)]
         except IndexError:
-            return [self.paths[_][self.main_time] for _ in range(self.agents_count)]
+            return [self.paths[_][-1] for _ in range(self.agents_count)]
 
     def algo1(self):
 
