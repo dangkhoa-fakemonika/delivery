@@ -5,6 +5,7 @@ import search_algorithms as algo
 
 if __name__ == '__main__':
     file_input = input('Enter the input file name (ex: input.txt): ')
+    custom = input('Use custom input? [Y/N]')
 
     game_board = Board()
     game_board.import_board_data(file_input)
@@ -30,6 +31,9 @@ if __name__ == '__main__':
 
     get_path = game_board.configure_algorithm(level)
     cost = algo.generate_time_cost(game_board.board_data, get_path, level)
+
+    if custom.lower() == 'y':
+        game_board.board_layout_init()
 
     algorithm = levels.index(level)
 

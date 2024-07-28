@@ -356,6 +356,29 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
         (scr_offset_x + box_size * grid_size[1] + 10 + 145, 205 + 30),
     ])
 
+    button_1, button_1_rect = draw_text(f"[A]: Previous Step", "comicsansms",  20,
+                                                (scr_offset_x + box_size * grid_size[1] + 40, 360))
+    button_2, button_2_rect = draw_text(f"[D]: Next Step", "comicsansms", 20,
+                                        (scr_offset_x + box_size * grid_size[1] + 40, 400))
+    button_3, button_3_rect = draw_text(f"[Left/Right Arrow]:", "comicsansms", 20,
+                                        (scr_offset_x + box_size * grid_size[1] + 40, 440))
+    button_32, button_32_rect = draw_text(f"Change Algorithm", "comicsansms", 20,
+                                        (scr_offset_x + box_size * grid_size[1] + 40, 470))
+
+    button_4, button_4_rect = draw_text(f"[Space]: Auto Move", "comicsansms", 20,
+                                        (scr_offset_x + box_size * grid_size[1] + 40, 510))
+    button_5, button_5_rect = draw_text(f"[Esc]: Quit", "comicsansms", 20,
+                                        (scr_offset_x + box_size * grid_size[1] + 40, 550))
+
+    info_list.extend([
+        (button_1, button_1_rect),
+        (button_2, button_2_rect),
+        (button_3, button_3_rect),
+        (button_32, button_32_rect),
+        (button_4, button_4_rect),
+        (button_5, button_5_rect),
+    ])
+
     scr.blits(info_list)
 
 
