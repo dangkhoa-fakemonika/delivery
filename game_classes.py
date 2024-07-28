@@ -145,7 +145,6 @@ class GridLV4:
                             else:
                                 temp_path = algo.LVL4_UCS(self.grid_data, can, self.goals[a], self.time_limit - t - 1,
                                                           self.fuel_limit, self.current_fuel[a])
-
                             if temp_path is None:
                                 continue
 

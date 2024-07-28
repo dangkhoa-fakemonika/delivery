@@ -352,21 +352,18 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
     
     initial_priority = (0, 0, 0)
     
-    # Priority queue: (priority, steps, time, current_position, path)
+    # Priority queue: (priority, steps, time, fuel, current_position, path)
     pq = [(initial_priority, 0, 0, fuel_cap, start, [])]
     reached = {start: (0, fuel_cap)}
-
+    
     while pq:
         _, steps, time, fuel, current, path = heapq.heappop(pq)
-        # if (current == (17, 6)):
-        #     # print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
         
         if time > time_limit or fuel < 0:
             continue
         
         if current == end:
-            # print(f"Path cost: {steps}, Time: {time}")
-            return path + [current], []
+            return path + [current], None
         
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = current[0] + dx, current[1] + dy
@@ -379,7 +376,6 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     continue
                 
                 if str(cell)[0] == 'F':
-                    # print(f"Cell {cell} is fuel")
                     new_fuel = fuel_cap
                     new_time = time + int(str(cell)[1:]) + 1
                 else:
@@ -415,7 +411,6 @@ def generate_candidates_LVL4(block: tuple[int, int], board_data, goal, breaking)
 def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
              fuel_cap=float('inf'), current_fuel=float('inf')):
     rows, cols = len(board_data), len(board_data[0])
-
     initial_priority = (0, 0, 0)
 
     # Priority queue: (priority, steps, time, current_position, path)
