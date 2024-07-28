@@ -42,9 +42,9 @@ class GridLV4:
         self.paying_toll = [0 for _ in range(self.agents_count)]
 
     def get_poss(self, time):
-        if 0 <= time < self.main_time:
+        try:
             return [self.paths[_][time] for _ in range(self.agents_count)]
-        else:
+        except IndexError:
             return [self.paths[_][self.main_time] for _ in range(self.agents_count)]
 
     def algo1(self):

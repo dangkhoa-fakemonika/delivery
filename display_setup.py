@@ -10,9 +10,6 @@ def get_box_config(res: tuple[int, int], grid_size: tuple[int, int]):
     offset_x = (res[0] - box_width * grid_size[1]) // 2 - 150
     offset_y = (res[1] - box_width * grid_size[0]) // 2
 
-    # offset_x = 10
-    # offset_y = 10
-    print(box_width)
     return box_width, offset_x, offset_y
 
 
@@ -428,11 +425,13 @@ def draw_lv4_step(scr: pygame.Surface, agents_count, board_data, path_movement, 
 
     for a in range(agents_count):
         for m in range(time):
-            if m <= len(path_movement[a]):
+            try:
                 pygame.draw.rect(scr, (0, 128, 128),
                                  (scr_offset_x + path_movement[a][m][1] * box_size,
                                   scr_offset_y + path_movement[a][m][0] * box_size,
                                   box_size, box_size))
+            except IndexError:
+                pass
 
 
 def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, end, grid_size, box_width, offset_x=0,
