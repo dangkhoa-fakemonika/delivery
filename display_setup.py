@@ -287,7 +287,7 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
                 total_cost += 1
 
     info = []
-    current_cost, current_cost_rect = draw_text(f"Path cost: {path_movement[total_cost]}", "comicsansms",  20,
+    current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
                                                 (scr_offset_x + box_size * len(board_data[1]) + 40, 250))
     info.append((current_cost, current_cost_rect))
     if level in ('lvl2', 'lvl3'):

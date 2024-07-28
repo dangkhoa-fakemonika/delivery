@@ -1,8 +1,6 @@
 from typing import Literal
 import search_algorithms as algo
 import display_setup as ds
-import lv4 as l4
-import random
 
 
 class GridLV4:
@@ -24,8 +22,7 @@ class GridLV4:
             if get_path is None:
                 self.paths[i] = None
                 continue
-            timed_path = l4.get_timed_path(self.grid_data, get_path)
-            print(timed_path)
+            timed_path = algo.get_timed_path(self.grid_data, get_path)
             self.paths[i] = timed_path
 
         self.main_time = len(self.paths[0])
@@ -51,38 +48,26 @@ class GridLV4:
 
         # From the start, initiate all new part of the goal
         # A goal will move through its next step if it is not blocked
-        stalemate = True
         break_stalemate = False
-        repetitive = False
 
         self.init_path()
 
         # Main agent can't reach goal
         if self.paths[0] is None:
-            # print("Can't really proceed.")
             return None
 
-        # if self.main_time is float('inf'):
-        #     self.main_time = 0
         t = 0
         while t < self.main_time:
-            # stalemate = True
-#             print("\n\nTime", t)
-            if break_stalemate:
-                print("Breaking stalemate.")
-#             print("Current path state:")
-            for p in self.paths:
-                print(p)
+            # if break_stalemate:
+            #     print("Breaking stalemate.")
+            # for p in self.paths:
+            #     print(p)
 
             for a in range(self.agents_count):
-#                 print("Agent", a + 1)
                 if self.paths[a] is None:
                     continue
 
-#                 print("Current location:", self.paths[a][t])
-
                 if self.paying_toll[a] > 0:  # Is waiting
-#                     print("Is paying road toll")
                     self.paying_toll[a] -= 1
                     continue
                 elif str(self.grid_data[self.paths[a][t][0]][self.paths[a][t][1]]) > '0':  # Will wait
@@ -107,16 +92,15 @@ class GridLV4:
                         #     if new_path is None:
                         #         can_locations.remove(new_goal)
                         #
-                        # self.paths[a].extend(l4.get_timed_path(self.grid_data, new_path))
+                        # self.paths[a].extend(algo.get_timed_path(self.grid_data, new_path))
 #                         # print("Goal is generated at:", new_goal)
                         # self.goals[a] = new_goal
                     if a == 0:
-#                         print("Main agent has reached goal.")
                         self.main_time = len(self.paths[0])
                         return self.paths
 
                 # Find candidate directions that current agent can move to
-                cans = l4.generate_candidates_LVL4(self.paths[a][t], self.grid_data, self.goals[a],
+                cans = algo.generate_candidates_LVL4(self.paths[a][t], self.grid_data, self.goals[a],
                                                    break_stalemate)
 
                 # Checking collision
@@ -133,13 +117,11 @@ class GridLV4:
 
                 # If the agent can't move
                 if len(cans) == 0:
-#                     print("Can't move")
                     self.paths[a].insert(t, self.paths[a][t])
                     continue
 
                 # If the agent can move to it's designated path
                 elif self.paths[a][t + 1] in cans:
-#                     print("Normal movement to", self.paths[a][t + 1])
                     self.current_fuel[a] -= 1
                     continue
 
@@ -176,16 +158,13 @@ class GridLV4:
 
                     # No path can be selected or it wants to do nothing
                     if len(best_path) == 0 or best_path[0] == self.paths[a][t]:
-#                         print("No candidates can help reach goal, going to", cans[0])
                         self.paths[a].insert(t, cans[0])
                         self.paths[a].insert(t, self.paths[a][t])
 
                         continue
 
                     # Rewrite its path
-#                     print("Can move with ", best_path)
-                    self.paths[a][t + 1:] = l4.get_timed_path(self.grid_data, best_path)
-#                     print("Moved to", best_path[0])
+                    self.paths[a][t + 1:] = algo.get_timed_path(self.grid_data, best_path)
 
                     if a == 0:  # Main agent
                         self.main_time = len(self.paths[0])
@@ -201,7 +180,6 @@ class GridLV4:
             for prev_t in range(t):
                 if self.get_poss(prev_t) == self.get_poss(t):
                     break_stalemate = True
-
 
 class Board:
     def __init__(self, grid_width=0, grid_height=0, start_pos=(0, 0), end_pos=(0, 0)):  # Constructor
@@ -276,7 +254,7 @@ Screen offset: ({self.offset_x, self.offset_y})
                          self.box_size, self.offset_x, self.offset_y)
 
     def board_display(self, screen, path, step, level):
-        if self.board_layout is None:
+        if self.board_layout is None or level == 'lvl4':
             self.board_display_default(screen, path, step, level)
         else:
             self.board_display_layout(screen, path, step, level)
@@ -370,7 +348,7 @@ Screen offset: ({self.offset_x, self.offset_y})
         print("\r LV4 is running...", end="")
         self.lv4_data.algo1()
         self.algorithm_paths.append(self.lv4_data.paths)
-        print(self.algorithm_paths[-1])
+        # print(self.algorithm_paths[-1])
         print("\rFinished!")
 
     def configure_algorithm(self, algorithm: str | Literal['bfs', 'dfs', 'ucs', 'gbfs', 'a*', 'lvl2', 'lvl3'] = 'bfs'):

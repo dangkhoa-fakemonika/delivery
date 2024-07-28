@@ -89,6 +89,26 @@ def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]],
 
     return total_time
 
+def get_timed_path(board_data, path):
+    timed_path = []
+
+    total_cost = 0
+    total_time = 0
+    stopped_time = 0
+
+    while total_time <= generate_time_cost(board_data, path, 'lvl3'):
+        timed_path.append(path[total_cost])
+
+        total_time += 1
+        stopped_time += 1
+        current_block = board_data[path[total_cost][0]][path[total_cost][1]]
+
+        if int(str(current_block).strip('F')) + 1 == stopped_time:  # Has finished through a cell
+            stopped_time = 0
+            total_cost += 1
+
+    return timed_path
+
 
 def BFS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int]):
     reached: dict[tuple[int, int]: tuple[int, int]] = {start: -1}
@@ -236,7 +256,7 @@ def LVL2_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
         steps, time, current, path = heapq.heappop(pq)
         
         if current == end:
-            print(f"Path cost: {steps}, Time: {time}")
+            # print(f"Path cost: {steps}, Time: {time}")
             return path + [current], []
         
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -338,14 +358,14 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
 
     while pq:
         _, steps, time, fuel, current, path = heapq.heappop(pq)
-        if (current == (17, 6)):
-            print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
+        # if (current == (17, 6)):
+        #     # print(f"Path cost: {steps}, Time: {time}, Fuel: {fuel}")
         
         if time > time_limit or fuel < 0:
             continue
         
         if current == end:
-            print(f"Path cost: {steps}, Time: {time}")
+            # print(f"Path cost: {steps}, Time: {time}")
             return path + [current], []
         
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -359,7 +379,7 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     continue
                 
                 if str(cell)[0] == 'F':
-                    print(f"Cell {cell} is fuel")
+                    # print(f"Cell {cell} is fuel")
                     new_fuel = fuel_cap
                     new_time = time + int(str(cell)[1:]) + 1
                 else:
@@ -373,6 +393,24 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
                     heapq.heappush(pq, (priority, steps + 1, new_time, new_fuel, new_pos, path + [current]))
     
     return None, None
+
+def generate_candidates_LVL4(block: tuple[int, int], board_data, goal, breaking):
+    neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    # if not breaking:
+    #     neighbors.append((0, 0))  # Stand still action
+    explored = []
+
+    for neighbor in neighbors:
+        x, y = block[0] + neighbor[0], block[1] + neighbor[1]
+        if (
+                0 <= x < len(board_data) and
+                0 <= y < len(board_data[0]) and
+                str(board_data[x][y]) >= '0'
+        ):
+            explored.append((x, y))
+    explored.sort(key=lambda a: abs(goal[0] - a[0]) + abs(
+        goal[1] - a[1]))  #prioritize tile closer to goal based on manhattan distance
+    return explored
 
 def LVL4_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int, int], time_limit=float('inf'),
              fuel_cap=float('inf'), current_fuel=float('inf')):
