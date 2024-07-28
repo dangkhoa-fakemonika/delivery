@@ -4,11 +4,8 @@ import search_algorithms as algo
 
 
 if __name__ == '__main__':
-    # file_input = input('Enter the input file name (ex: input.txt): ')
-    # custom = input('Use custom input? [Y/N] ')
-
-    file_input = "input/input_level4_basic.txt"
-    custom = 'a'
+    file_input = input('Enter the input file name (ex: input.txt): ')
+    custom = input('Use custom textures? [Y/N] ')
 
     game_board = Board()
     game_board.import_board_data(file_input)
