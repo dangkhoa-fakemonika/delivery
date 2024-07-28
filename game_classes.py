@@ -269,22 +269,28 @@ Screen offset: ({self.offset_x, self.offset_y})
         for _ in range(int(rows)):
             line = fs.readline().split()
             temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric() else i for i in line]
+  
+            for s in range(len(temp)):
+                if isinstance(temp[s], str):
+                    if temp[s] == 'S':
+                        s_list[0] = (_, s)
+                        temp[s] = 0
 
-            for s in temp:
-                if isinstance(s, str):
-                    if s == 'S':
-                        s_list[0] = (_, temp.index(s))
-                    elif s[0] == 'S':
-                        pos = int(s[-1])
-                        s_list[pos] = (_, temp.index(s))
+                    elif temp[s][0] == 'S':
+                        pos = int(temp[s][-1])
+                        s_list[pos] = (_, s)
+                        temp[s] = 0
 
-            for g in temp:
-                if isinstance(g, str):
-                    if g == 'G':
-                        g_list[0] = (_, temp.index(g))
-                    elif g[0] == 'G':
-                        pos = int(g[-1])
-                        g_list[pos] = (_, temp.index(g))
+            for g in range(len(temp)):
+                if isinstance(temp[g], str):
+                    if temp[g] == 'G':
+                        g_list[0] = (_, g)
+                        temp[g] = 0
+                        
+                    elif temp[g][0] == 'G':
+                        pos = int(temp[g][-1])
+                        g_list[pos] = (_, g)
+                        temp[g] = 0
 
             adj.append(temp)
         fs.close()
