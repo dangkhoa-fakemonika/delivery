@@ -6,7 +6,7 @@ def get_box_config(res: tuple[int, int], grid_size: tuple[int, int]):
     width = res[0] - 100
     height = res[1] - 100
 
-    box_width = min(width // grid_size[1], height // grid_size[0])
+    box_width = min(min(width // grid_size[1], height // grid_size[0]), 80)
     offset_x = (res[0] - box_width * grid_size[1]) // 2 - 100
     offset_y = (res[1] - box_width * grid_size[0]) // 2
 
@@ -251,7 +251,7 @@ def draw_assets_board_data(scr: pygame.Surface, level, board_data, assets_genera
 def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
     if path_movement is None:
         invalid, invalid_rect = draw_text(f"No valid path.", "comicsansms",  20,
-                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5),
+                                                (scr_offset_x + box_size * len(board_data[0]) + 40, 250),
                                           (255, 10, 10))
         scr.blit(invalid, invalid_rect)
         return 0
@@ -419,8 +419,8 @@ def draw_info_box(scr: pygame.Surface, start, end, level, time_limit, fuel_limit
 
 def draw_lv4_step(scr: pygame.Surface, agents_count, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
     if path_movement[0] is None:
-        invalid, invalid_rect = draw_text(f"No valid path for main agent.", "comicsansms",  20,
-                                                (scr_offset_x * 2 + box_size * len(board_data[0]) + 10, scr_offset_y + 10 + box_size * 5),
+        invalid, invalid_rect = draw_text(f"No valid path.", "comicsansms",  20,
+                                                (scr_offset_x + box_size * len(board_data[0]) + 40, 250),
                                           (255, 10, 10))
         scr.blit(invalid, invalid_rect)
         return
@@ -432,6 +432,7 @@ def draw_lv4_step(scr: pygame.Surface, agents_count, board_data, path_movement, 
                                  (scr_offset_x + path_movement[a][m][1] * box_size,
                                   scr_offset_y + path_movement[a][m][0] * box_size,
                                   box_size, box_size))
+
 
 def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, end, grid_size, box_width, offset_x=0,
                     offset_y=0):

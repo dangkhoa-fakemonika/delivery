@@ -76,7 +76,10 @@ def generate_path(reached_table: dict[tuple[int, int]: tuple[int, int]], start: 
 def generate_time_cost(board_data: list[list[int]], path: list[tuple[int, int]], level):
     if path is None:
         return 0
+
     if level == 'lvl4':
+        if path[0] is None:
+            return 0
         return len(path[0])
 
     total_time = len(path) - 1
@@ -392,8 +395,8 @@ def LVL3_UCS(board_data: list[list[int]], start: tuple[int, int], end: tuple[int
 
 def generate_candidates_LVL4(block: tuple[int, int], board_data, goal, breaking):
     neighbors = [(-1, 0), (0, -1), (1, 0), (0, 1)]
-    # if not breaking:
-    #     neighbors.append((0, 0))  # Stand still action
+    if not breaking:
+        neighbors.append((0, 0))  # Stand still action
     explored = []
 
     for neighbor in neighbors:

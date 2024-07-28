@@ -25,7 +25,10 @@ class GridLV4:
             timed_path = algo.get_timed_path(self.grid_data, get_path)
             self.paths[i] = timed_path
 
-        self.main_time = len(self.paths[0])
+        if self.paths[0] is None:
+            self.main_time = 0
+        else:
+            self.main_time = len(self.paths[0])
 
     def get_initial_data(self, data, starts, goals, time_limit=float('inf'), fuel_limit=float('inf')):
         self.grid_data = data
@@ -42,7 +45,7 @@ class GridLV4:
         if 0 <= time < self.main_time:
             return [self.paths[_][time] for _ in range(self.agents_count)]
         else:
-            return [self.paths[_][self.main_time - 1] for _ in range(self.agents_count)]
+            return [self.paths[_][self.main_time] for _ in range(self.agents_count)]
 
     def algo1(self):
 
@@ -53,7 +56,7 @@ class GridLV4:
         self.init_path()
 
         # Main agent can't reach goal
-        if self.paths[0] is None:
+        if self.paths[0] is None or self.main_time == 0:
             return None
 
         t = 0
@@ -175,10 +178,12 @@ class GridLV4:
                         self.current_fuel[a] -= 1
 
             t += 1
+            # prev_stale = break_stalemate
             break_stalemate = False
             for prev_t in range(t):
                 if self.get_poss(prev_t) == self.get_poss(t):
                     break_stalemate = True
+                    break
 
 class Board:
     def __init__(self, grid_width=0, grid_height=0, start_pos=(0, 0), end_pos=(0, 0)):  # Constructor
@@ -225,8 +230,14 @@ Screen offset: ({self.offset_x, self.offset_y})
             # print(self.lv4_data.get_poss(step))
             ds.draw_lv4_step(screen, self.lv4_data.agents_count, self.board_data, path, step, self.fuel_limit,
                              self.box_size, self.offset_x, self.offset_y)
-            ds.draw_lv4_board_data(screen, self.lv4_data.agents_count, self.board_data, self.lv4_data.get_poss(step),
-                                   self.lv4_data.goals, self.size, self.box_size, self.offset_x, self.offset_y)
+
+            if path[0] is not None:
+                ds.draw_lv4_board_data(screen, self.lv4_data.agents_count, self.board_data, self.lv4_data.get_poss(step),
+                                       self.lv4_data.goals, self.size, self.box_size, self.offset_x, self.offset_y)
+            else:
+                ds.draw_lv4_board_data(screen, self.lv4_data.agents_count, self.board_data,
+                                       self.lv4_data.starts,
+                                       self.lv4_data.goals, self.size, self.box_size, self.offset_x, self.offset_y)
 
         ds.draw_grid(screen, self.size, self.box_size, self.offset_x, self.offset_y)
         ds.draw_info_box(screen, self.start, self.end, level, self.time_limit, self.fuel_limit, self.size,
