@@ -6,7 +6,7 @@ def get_box_config(res: tuple[int, int], grid_size: tuple[int, int]):
     width = res[0] - 100
     height = res[1] - 100
 
-    box_width = min(width // grid_size[0], height // grid_size[1])
+    box_width = min(width // grid_size[1], height // grid_size[0])
     offset_x = (res[0] - box_width * grid_size[1]) // 2 - 100
     offset_y = (res[1] - box_width * grid_size[0]) // 2
 
@@ -281,25 +281,58 @@ def draw_step(scr: pygame.Surface, level, board_data, path_movement, time, fuel,
         elif level == 'lvl3':
             if str(current_block)[0] == 'F':
                 fuel_cost = fuel
-            if int(str(current_block).strip('F')) + 1 == stopped_time: # Has finished through a cell
+            if int(str(current_block).strip('F')) + 1 == stopped_time:  # Has finished through a cell
                 fuel_cost -= 1
                 stopped_time = 0
                 total_cost += 1
 
     info = []
     current_cost, current_cost_rect = draw_text(f"Path cost: {total_cost}", "comicsansms",  20,
-                                                (scr_offset_x + box_size * len(board_data[1]) + 40, 250))
+                                                (scr_offset_x + box_size * len(board_data[0]) + 40, 250))
     info.append((current_cost, current_cost_rect))
     if level in ('lvl2', 'lvl3'):
         time_cost, time_cost_rect = draw_text(f"Current Time: {total_time}", "comicsansms", 20,
-                                          (scr_offset_x + box_size * len(board_data[1]) + 40, 280))
+                                          (scr_offset_x + box_size * len(board_data[0]) + 40, 280))
         info.append((time_cost, time_cost_rect))
     if level == 'lvl3':
         current_fuel, current_fuel_rect = draw_text(f"Current Fuel: {fuel_cost}", "comicsansms", 20,
-                                                    (scr_offset_x + box_size * len(board_data[1]) + 40, 310))
+                                                    (scr_offset_x + box_size * len(board_data[0]) + 40, 310))
         info.append((current_fuel, current_fuel_rect))
 
     scr.blits(info)
+
+    return total_cost
+
+
+def draw_step_layout(scr: pygame.Surface, level, board_data, path_movement, time, fuel, box_size, scr_offset_x, scr_offset_y):
+    total_cost = 0
+    total_time = 0
+    fuel_cost = fuel
+    stopped_time = 0
+
+    while total_time < time:
+        pygame.draw.circle(scr, (255, 0, 0),
+                         (scr_offset_x + (path_movement[total_cost][1] + 0.5) * box_size,
+                          scr_offset_y + (path_movement[total_cost][0] + 0.5) * box_size), 5)
+        total_time += 1
+        stopped_time += 1
+        current_block = board_data[path_movement[total_cost][0]][path_movement[total_cost][1]]
+
+        if level in ('bfs', 'dfs', 'ucs', 'gbfs', 'a*'):
+            total_cost += 1
+
+        elif level == 'lvl2':
+            if str(current_block)[0] == 'F' or int(str(current_block).strip('F')) + 1 == stopped_time:
+                stopped_time = 0
+                total_cost += 1
+
+        elif level == 'lvl3':
+            if str(current_block)[0] == 'F':
+                fuel_cost = fuel
+            if int(str(current_block).strip('F')) + 1 == stopped_time:  # Has finished through a cell
+                fuel_cost -= 1
+                stopped_time = 0
+                total_cost += 1
 
     return total_cost
 
@@ -394,13 +427,11 @@ def draw_lv4_step(scr: pygame.Surface, agents_count, board_data, path_movement, 
 
     for a in range(agents_count):
         for m in range(time):
-            pygame.draw.rect(scr, (0, 128, 128),
-                             (scr_offset_x + path_movement[a][m][1] * box_size,
-                              scr_offset_y + path_movement[a][m][0] * box_size,
-                              box_size, box_size))
-
-    info = []
-
+            if m <= len(path_movement[a]):
+                pygame.draw.rect(scr, (0, 128, 128),
+                                 (scr_offset_x + path_movement[a][m][1] * box_size,
+                                  scr_offset_y + path_movement[a][m][0] * box_size,
+                                  box_size, box_size))
 
 def draw_lv4_board_data(scr: pygame.Surface, agents_count, board_data, start, end, grid_size, box_width, offset_x=0,
                     offset_y=0):
