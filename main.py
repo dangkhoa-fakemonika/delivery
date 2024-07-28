@@ -7,8 +7,8 @@ if __name__ == '__main__':
     # file_input = input('Enter the input file name (ex: input.txt): ')
     # custom = input('Use custom input? [Y/N] ')
 
-    file_input = "input/input_level2_multipath.txt"
-    custom = 'lvl2'
+    file_input = "input/input_theoretically.txt"
+    custom = 'a'
 
     game_board = Board()
     game_board.import_board_data(file_input)
