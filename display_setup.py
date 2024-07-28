@@ -6,12 +6,13 @@ def get_box_config(res: tuple[int, int], grid_size: tuple[int, int]):
     width = res[0] - 100
     height = res[1] - 100
 
-    box_width = min(min(width // grid_size[1], height // grid_size[0]), 80)
-    offset_x = (res[0] - box_width * grid_size[1]) // 2 - 100
+    box_width = min(min(width, height) // (max(grid_size[0], grid_size[1]) + 1), 80)
+    offset_x = (res[0] - box_width * grid_size[1]) // 2 - 150
     offset_y = (res[1] - box_width * grid_size[0]) // 2
 
     # offset_x = 10
     # offset_y = 10
+    print(box_width)
     return box_width, offset_x, offset_y
 
 
