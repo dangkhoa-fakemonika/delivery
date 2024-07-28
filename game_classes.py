@@ -160,9 +160,8 @@ class GridLV4:
 
                     # No path can be selected or it wants to do nothing
                     if len(best_path) == 0 or best_path[0] == self.paths[a][t]:
-                        self.paths[a].insert(t, cans[0])
                         self.paths[a].insert(t, self.paths[a][t])
-
+                        # self.paths[a].insert(t, cans[0])
                         continue
 
                     # Rewrite its path
