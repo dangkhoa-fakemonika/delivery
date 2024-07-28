@@ -258,15 +258,15 @@ Screen offset: ({self.offset_x, self.offset_y})
         else:
             self.board_display_layout(screen, path, step, level)
 
-    def import_board_lv4(self, filename):
+    def import_board(self, filename):
         fs = open(filename, "r")
 
         s_list = [(-1, -1)] * 10
         g_list = [(-1, -1)] * 10
 
-        n, m, t, f = fs.readline().split()
+        rows, cols, time, fuel = fs.readline().split()
         adj = []
-        for _ in range(int(n)):
+        for _ in range(int(rows)):
             line = fs.readline().split()
             temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric() else i for i in line]
 
@@ -289,43 +289,50 @@ Screen offset: ({self.offset_x, self.offset_y})
             adj.append(temp)
         fs.close()
 
+        self.board_data = adj
+        self.start = s_list[0]
+        self.end = g_list[0]
+        self.time_limit = int(time) if time != "inf" else float('inf')
+        self.fuel_limit = int(fuel) if fuel != "inf" else float('inf')
+        self.size = (len(adj), len(adj[0]))
+
         s_list = list(filter(lambda x: x != (-1, -1), s_list))
         g_list = list(filter(lambda x: x != (-1, -1), g_list))
 
         self.lv4_data.get_initial_data(self.board_data, s_list, g_list, self.time_limit, self.fuel_limit)
 
-    def import_board_data(self, filename):
-        # Do the import data here
-        fs = open(filename, "r")
-        s_pos = (0, 0)
-        e_pos = (0, 0)
+    # def import_board_data(self, filename):
+    #     # Do the import data here
+    #     fs = open(filename, "r")
+    #     s_pos = (0, 0)
+    #     e_pos = (0, 0)
 
-        rows, cols, time, fuel = fs.readline().split()
-        adj = []
-        for i in range(int(rows)):
-            line = fs.readline().split()
-            temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric()
-                    else 0 if len(i) == 2 and i[0] != 'F' else i for i in line]
-            if 'S' in temp:
-                s_pos = (i, temp.index('S'))
-                temp[s_pos[1]] = 0
+    #     rows, cols, time, fuel = fs.readline().split()
+    #     adj = []
+    #     for i in range(int(rows)):
+    #         line = fs.readline().split()
+    #         temp = [int(i) if i.isnumeric() or (i.lstrip('-')).isnumeric()
+    #                 else 0 if len(i) == 2 and i[0] != 'F' else i for i in line]
+    #         if 'S' in temp:
+    #             s_pos = (i, temp.index('S'))
+    #             temp[s_pos[1]] = 0
 
-            if 'G' in temp:
-                e_pos = (i, temp.index('G'))
-                temp[e_pos[1]] = 0
-                # print(e_pos)
+    #         if 'G' in temp:
+    #             e_pos = (i, temp.index('G'))
+    #             temp[e_pos[1]] = 0
+    #             # print(e_pos)
 
-            adj.append(temp)
-        fs.close()
+    #         adj.append(temp)
+    #     fs.close()
 
-        self.board_data = adj
-        self.start = s_pos
-        self.end = e_pos
-        self.time_limit = int(time) if time != "inf" else float('inf')
-        self.fuel_limit = int(fuel) if fuel != "inf" else float('inf')
-        self.size = (len(adj), len(adj[0]))
+    #     self.board_data = adj
+    #     self.start = s_pos
+    #     self.end = e_pos
+    #     self.time_limit = int(time) if time != "inf" else float('inf')
+    #     self.fuel_limit = int(fuel) if fuel != "inf" else float('inf')
+    #     self.size = (len(adj), len(adj[0]))
 
-        self.import_board_lv4(filename)
+    #     self.import_board_lv4(filename)
 
     def run_algorithms(self):
         print("Running algorithm...", end="")
